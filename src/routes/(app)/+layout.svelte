@@ -27,10 +27,18 @@
 	class="footer footer-horizontal footer-center bg-base-200 text-base-content mt-4 rounded p-10">
 	<nav>
 		<div class="grid grid-flow-col gap-4">
-			<a href="/" class="text-2xl">
+			<a
+				href="https://discord.gg/smyaYEM7V4"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="text-2xl">
 				<Fa icon={faDiscord} />
 			</a>
-			<a href="/" class="text-2xl">
+			<a
+				href="https://github.com/Layendan/OsuPulse"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="text-2xl">
 				<Fa icon={faGithub} />
 			</a>
 		</div>
