@@ -1,0 +1,19 @@
+# .dockerignore
+
+# Ignore node_modules and other dependencies
+node_modules
+*.log
+*.lock
+
+# Ignore build output
+build
+dist
+.svelte-kit
+drizzle
+db
+
+# Ignore local development files
+.DS_Store
+.vscode
+.idea
+*.swp

@@ -1,0 +1,30 @@
+import type { UserNeighbor } from '$lib';
+
+import { error } from '@sveltejs/kit';
+import { query } from '$app/server';
+import { number } from 'valibot';
+
+type NeighborResponse = {
+	user_id: number;
+	top_neighbors: UserNeighbor[];
+};
+
+export const getUserFlowNeighbors = query(number(), async (userId) => {
+	const url = new URL('http://127.0.0.1:8000/user_flow/');
+	const response = await fetch(url, {
+		method: 'POST',
+		headers: {
+			accept: 'application/json',
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			user_id: userId
+		})
+	});
+
+	if (!response.ok) error(404, 'Not found');
+
+	const neighbors: NeighborResponse = await response.json();
+
+	return neighbors;
+});

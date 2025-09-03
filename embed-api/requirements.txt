@@ -1,0 +1,8 @@
+aiohttp
+aiosu
+numpy
+pandas
+fastapi
+pydantic
+pymilvus
+scipy
