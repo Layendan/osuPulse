@@ -6,3 +6,4 @@ fastapi
 pydantic
 pymilvus
 scipy
+uvicorn
