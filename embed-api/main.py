@@ -8,6 +8,7 @@ import zipfile
 from collections import defaultdict
 from contextlib import asynccontextmanager
 from math import log2
+import time
 
 import aiohttp
 import aiosu
@@ -15,7 +16,7 @@ import numpy as np
 import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel
-from pymilvus import Collection, connections
+from pymilvus import MilvusClient
 from scipy.stats import norm, zscore
 
 SKILL_COLUMNS = [
@@ -69,6 +70,7 @@ MOD_PRESETS_SKILLS = {
 }
 ROOT_DIR = "beatmap_downloads"
 OUTPUT_DIR = "skills_outputs"
+COLLECTION_NAME = "osu_beatmap_collection"
 os.makedirs(ROOT_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -84,19 +86,12 @@ class UserRequest(BaseModel):
     top_n_neighbors: int = 50
 
 
-search_params = {"metric_type": "L2", "params": {"ef": 64}}
+search_params = {"metric_type": "L2", "params": {"ef": 32}}
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Connect to Milvus
-    connections.connect(
-        "default",
-        host=os.environ.get("MILVUS_HOST", "localhost"),
-        port=os.environ.get("MILVUS_PORT", "19530"),
-    )
-    collection = Collection("osu_beatmap_collection")
-    collection.load()
+    client = MilvusClient("./milvus_lite.db")
 
     # Create aiosu client
     aiosu_client = aiosu.v2.Client(
@@ -104,7 +99,7 @@ async def lifespan(app: FastAPI):
         client_secret=os.getenv("OSU_CLIENT_SECRET"),
     )
 
-    app.state.collection = collection
+    app.state.milvus_client = client
     app.state.aiosu_client = aiosu_client
 
     ingest_task = asyncio.create_task(background_beatmap_ingest(app))
@@ -113,6 +108,7 @@ async def lifespan(app: FastAPI):
 
     # Cleanup
     await aiosu_client.aclose()
+    client.close();
     ingest_task.cancel()
 
 
@@ -121,10 +117,10 @@ app = FastAPI(lifespan=lifespan)
 
 async def background_beatmap_ingest(app):
     while True:
-        collection = app.state.collection
+        client = app.state.milvus_client
         aiosu_client = app.state.aiosu_client
         print("processing new beatmaps")
-        await process_new_ranked_maps(collection, aiosu_client)
+        await process_new_ranked_maps(client, aiosu_client)
         await asyncio.sleep(1800)  # 30 minutes
 
 
@@ -149,19 +145,19 @@ def extract_osz_files(pack_dir):
                 zf.extractall(extract_folder)
 
 
-def beatmapset_exists_in_milvus(collection, beatmapsetid):
-    results = collection.query(
-        expr=f"BeatmapsetID == {beatmapsetid}", output_fields=["BeatmapsetID"]
+def beatmapset_exists_in_milvus(client, beatmapsetid):
+    results = client.query(collection_name=COLLECTION_NAME,
+        filter=f"BeatmapsetID == {beatmapsetid}", output_fields=["BeatmapsetID"], limit=1
     )
     return len(results) > 0
 
 
-def insert_beatmaps_into_milvus(collection):
+def insert_beatmaps_into_milvus(client):
     csv_files = glob.glob(os.path.join(OUTPUT_DIR, "*.csv"))
     dtype_dict = {
-        "BeatmapID": "Int64",  # nullable integer type, preserves NA
+        "BeatmapID": "Int64",
         "BeatmapsetID": "Int64",
-        "Mods": "Int64",  # use Int64 instead of Int8 for safety
+        "Mods": "Int64",
         "Title": "string",
         "Version": "string",
         "Stamina": "float64",
@@ -185,13 +181,11 @@ def insert_beatmaps_into_milvus(collection):
         )
         available_cols = [col for col in COLUMNS_TO_USE if col in df.columns]
         df_list.append(df[available_cols])
-
     combined_df = pd.concat(df_list, ignore_index=True)
 
-    # Create "embedding" column from skill_columns as list of floats for vector
+    # Create embedding column as list
     combined_df["embedding"] = combined_df[SKILL_COLUMNS].values.tolist()
 
-    # Define a dictionary of fixup rules for each column (fillna + convert type)
     fixup_rules = {
         "BeatmapID": ("int64", -1),
         "BeatmapsetID": ("int64", -1),
@@ -199,47 +193,61 @@ def insert_beatmaps_into_milvus(collection):
         "Title": ("string", "Unknown Title"),
         "Version": ("string", "Unknown Version"),
     }
-
-    # Apply fixup all at once
     for col, (dtype, fill_value) in fixup_rules.items():
         combined_df[col] = combined_df[col].fillna(fill_value).astype(dtype)
 
-    # After conversions, filter relevant integer columns for invalid values (e.g. negative)
     for col in ["BeatmapID", "BeatmapsetID", "Mods"]:
         combined_df = combined_df[combined_df[col] >= (0 if col == "Mods" else 1)]
 
-    # 1. Replace NaN/inf/-inf in all relevant float columns
     for col in SKILL_COLUMNS:
-        # You may want to choose a default value (here, 0.0)
         combined_df[col] = combined_df[col].replace([np.nan, np.inf, -np.inf], 0.0)
 
-    # 2. Replace NaN/inf/-inf inside the "embedding" column (since it's a list)
+
     def clean_embedding(vec):
-        # Replace any NaN/inf/-inf within the vector with 0.0
         return [float(x) if (pd.notnull(x) and np.isfinite(x)) else 0.0 for x in vec]
 
     combined_df["embedding"] = combined_df["embedding"].apply(clean_embedding)
 
-    print(combined_df.head())
+    # Prepare data for insertion as list of dictionaries
+    data_to_insert = []
+    for _, row in combined_df.iterrows():
+        record = {col: row[col] for col in COLUMNS_TO_USE}
+        record.update({col: row[col] for col in SKILL_COLUMNS})
+        record["embedding"] = row["embedding"]
+        data_to_insert.append(record)
 
-    # Insert data into Milvus from pandas DataFrame
-    collection.insert(combined_df)
+    BATCH_SIZE = 1000
 
-    # Flush to make sure data is persisted
-    collection.flush()
+    num_records = len(data_to_insert)
+    num_batches = (num_records + BATCH_SIZE - 1) // BATCH_SIZE
 
-    # Create HNSW_SQ index on embedding vector field for nearest neighbor search
-    index_params = {
-        "index_type": "HNSW_SQ",
-        "metric_type": "L2",
-        "params": {"M": 8, "efConstruction": 32}
-    }
-    collection.create_index(field_name="embedding", index_params=index_params)
+    for i in range(num_batches):
+        start_idx = i * BATCH_SIZE
+        end_idx = min((i + 1) * BATCH_SIZE, num_records)
+        batch = data_to_insert[start_idx:end_idx]
+        client.insert(collection_name=COLLECTION_NAME, data=batch)
+        print(f"Batch {i+1}/{num_batches} inserted")
+        time.sleep(0.2)  # short delay to reduce ping frequency
 
-    print(f"Inserted {len(combined_df)} records into Milvus collection collection.")
+    # Persist data
+    client.flush(COLLECTION_NAME)
+
+    index_params = client.prepare_index_params()
+    index_params.add_index(
+        field_name="embedding",
+        index_type="FLAT",
+        metric_type="L2",
+        params={"M": 8, "efConstruction": 32},
+    )
+
+    client.create_index(collection_name=COLLECTION_NAME, index_params=index_params)
+
+    print(
+        f"Inserted {len(combined_df)} records into Milvus Lite collection '{COLLECTION_NAME}'."
+    )
 
 
-async def process_new_ranked_maps(collection, aiosu_client):
+async def process_new_ranked_maps(client, aiosu_client):
     packs = await aiosu_client.get_beatmap_packs(
         type=aiosu.models.beatmap.BeatmapPackType.STANDARD
     )
@@ -260,7 +268,7 @@ async def process_new_ranked_maps(collection, aiosu_client):
         # Check if any beatmapset is missing in Milvus
         any_missing = False
         for bmset in beatmap_pack.beatmapsets:
-            if not beatmapset_exists_in_milvus(collection, bmset.id):
+            if not beatmapset_exists_in_milvus(client, bmset.id):
                 any_missing = True
                 break
         if not any_missing:
@@ -310,7 +318,7 @@ async def process_new_ranked_maps(collection, aiosu_client):
             print(f"FAILED for {mod_name}: {e}")
 
     # Insert embeddings into Milvus using existing function
-    insert_beatmaps_into_milvus(collection)
+    insert_beatmaps_into_milvus(client)
 
     # Cleanup all downloaded and extracted files
     print("Cleaning up temporary files...")
@@ -321,11 +329,12 @@ async def process_new_ranked_maps(collection, aiosu_client):
 
 
 def find_similar_beatmaps_by_id(
-    collection: Collection, beatmap_id: int, mod: int, top_n=10
+    client: MilvusClient, beatmap_id: int, mod: int, top_n=10
 ):
     expr = f"(BeatmapID == {beatmap_id}) and (Mods == {mod})"
-    res = collection.query(
-        expr=expr,
+    res = client.query(
+        collection_name=COLLECTION_NAME,
+        filter=expr,
         output_fields=["embedding"]
         + SKILL_COLUMNS
         + ["Title", "Version", "BeatmapID", "Mods", "BeatmapsetID"],
@@ -337,10 +346,11 @@ def find_similar_beatmaps_by_id(
     query_vector = query_record["embedding"]
     query_skill_vector = [query_record[skill] for skill in SKILL_COLUMNS]
     query_skill_sum = sum(query_skill_vector)
-    search_results = collection.search(
+    search_results = client.search(
+        collection_name=COLLECTION_NAME,
         data=[query_vector],
         anns_field="embedding",
-        param=search_params,
+        params=search_params,
         limit=top_n + 1,
         output_fields=["BeatmapID", "BeatmapsetID", "Mods", "Title", "Version"]
         + SKILL_COLUMNS,
@@ -418,7 +428,7 @@ async def get_user_recent_scores(
     ]
 
 
-def tally_neighbors(collection: Collection, user_scores: list, top_n_neighbors=50):
+def tally_neighbors(client: MilvusClient, user_scores: list, top_n_neighbors=50):
     neighbor_info = defaultdict(
         lambda: {
             "distances": [],
@@ -439,7 +449,7 @@ def tally_neighbors(collection: Collection, user_scores: list, top_n_neighbors=5
         user_weight = 1 - (idx / 100)
         user_accuracy = score.get("accuracy", 0)
         neighbor_rows, skill_value = find_similar_beatmaps_by_id(
-            collection, beatmap_id, mod, top_n=10
+            client, beatmap_id, mod, top_n=10
         )
         if neighbor_rows is None or skill_value is None:
             continue
@@ -501,7 +511,7 @@ async def health():
 @app.get("/similar_beatmaps/")
 async def api_similar_beatmaps(beatmap_id: int, mods: int, top_n: int = 10):
     rows, skill_sum = find_similar_beatmaps_by_id(
-        app.state.collection, beatmap_id, mods, top_n
+        app.state.milvus_client, beatmap_id, mods, top_n
     )
     if rows is None:
         return {"error": "No such beatmap found"}
@@ -513,7 +523,7 @@ async def api_user_top_neighbors(req: UserRequest):
     try:
         user_scores = await get_user_top_scores(app.state.aiosu_client, req.user_id)
         summary = tally_neighbors(
-            app.state.collection,
+            app.state.milvus_client,
             user_scores,
             req.top_n_neighbors,
         )
@@ -527,7 +537,7 @@ async def api_user_top_neighbors(req: UserRequest):
     try:
         user_scores = await get_user_recent_scores(app.state.aiosu_client, req.user_id)
         summary = tally_neighbors(
-            app.state.collection,
+            app.state.milvus_client,
             user_scores,
             req.top_n_neighbors,
         )

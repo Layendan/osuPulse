@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY osu_skills_rs_0.0.3_linux-x64 main.py ./
+COPY . .
 
 RUN chmod +x ./osu_skills_rs_0.0.3_linux-x64
 
