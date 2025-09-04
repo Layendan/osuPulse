@@ -1,16 +1,17 @@
 services:
   osupulse-app:
     container_name: osupulse-app
+    build:
+      context: ./
     working_dir: /app
     env_file:
       - ./.env
-    build:
-      context: ./
     expose:
       - '3000'
     depends_on:
       - embed-api
     networks:
+      - default
       - shared-proxy
     logging:
       driver: 'json-file'
@@ -33,10 +34,13 @@ services:
       - /mnt/external-drive/db-data/pulse/milvus_lite.db:/app/milvus_lite.db
     expose:
       - '8000'
-    depends_on:
-      - standalone
     networks:
-      - shared-proxy
+      - default
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '5'
     restart: unless-stopped
 
 networks:
