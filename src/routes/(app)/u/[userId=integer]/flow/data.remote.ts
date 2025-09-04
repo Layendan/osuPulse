@@ -11,7 +11,7 @@ type NeighborResponse = {
 };
 
 export const getUserFlowNeighbors = query(number(), async (userId) => {
-	const url = new URL(`http://${EMBED_API_URL}/user_flow/`);
+	const url = new URL(`${EMBED_API_URL}/user_flow/`);
 	const response = await fetch(url, {
 		method: 'POST',
 		headers: {

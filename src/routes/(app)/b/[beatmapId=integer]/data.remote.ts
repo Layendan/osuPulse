@@ -13,7 +13,7 @@ type NeighborResponse = {
 export const getBeatmapNeighbors = query(
 	object({ beatmapId: number(), mods: number() }),
 	async ({ beatmapId, mods = 0 }) => {
-		const url = new URL(`http://${EMBED_API_URL}/similar_beatmaps/`);
+		const url = new URL(`${EMBED_API_URL}/similar_beatmaps/`);
 
 		url.searchParams.set('beatmap_id', beatmapId.toString());
 		url.searchParams.set('mods', mods.toString());
