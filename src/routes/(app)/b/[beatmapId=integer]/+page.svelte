@@ -44,6 +44,27 @@
 
 <svelte:head>
 	<title>osu!Pulse - Recommended maps for {data.beatmap.beatmapset.title}</title>
+	<meta name="description" content="Find similar beatmaps for {data.beatmap.beatmapset.title}." />
+	<meta name="twitter:card" content="summary" />
+	<meta
+		name="twitter:title"
+		content="osu!Pulse - Recommended maps for {data.beatmap.beatmapset.title}" />
+	<meta
+		name="twitter:description"
+		content="Find similar beatmaps for {data.beatmap.beatmapset.title}." />
+	<meta property="og:type" content="website" />
+	<meta
+		property="og:title"
+		content="osu!Pulse - Recommended maps for {data.beatmap.beatmapset.title}" />
+	<meta
+		property="og:description"
+		content="Find similar beatmaps for {data.beatmap.beatmapset.title}." />
+	<meta property="og:url" content="https://pulse.layendan.dev" />
+	<meta property="og:site_name" content="osu!Pulse" />
+	<meta property="og:locale" content="en_US" />
+	<meta property="og:image" content={data.beatmap.beatmapset.covers['card@2x']} />
+	<meta property="og:image:alt" content="{data.beatmap.beatmapset.title} card" />
+	<meta property="og:image:secure_url" content={data.beatmap.beatmapset.covers['card@2x']} />
 </svelte:head>
 
 <div class="bg-base-200 container mx-auto gap-2 overflow-clip rounded-xl" id="main">

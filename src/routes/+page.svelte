@@ -8,6 +8,22 @@
 
 <svelte:head>
 	<title>osu!Pulse</title>
+	<meta name="description" content="Find similar beatmaps." />
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="osu!Pulse" />
+	<meta name="twitter:description" content="Find similar beatmaps." />
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content="osu!Pulse" />
+	<meta property="og:description" content="Find similar beatmaps." />
+	<meta property="og:url" content="https://pulse.layendan.dev" />
+	<meta property="og:site_name" content="osu!Pulse" />
+	<meta property="og:locale" content="en_US" />
+	<meta property="og:image" content="/logo.png" />
+	<meta property="og:image:alt" content="osu!Pulse Logo" />
+	<meta property="og:image:type" content="image/png" />
+	<meta property="og:image:width" content="506" />
+	<meta property="og:image:height" content="505" />
+	<meta property="og:image:secure_url" content="https://pulse.layendan.dev/logo.png" />
 </svelte:head>
 
 <div class="grid min-h-dvh w-dvw content-center items-center gap-12 py-8 md:px-8">

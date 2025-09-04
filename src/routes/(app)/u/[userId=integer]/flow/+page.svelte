@@ -28,7 +28,20 @@
 </script>
 
 <svelte:head>
-	<title>osu!Pulse - Recommended maps for {data.user.username}</title>
+	<title>osu!Pulse - {data.user.username}'s flow</title>
+	<meta name="description" content="Find similar beatmaps for {data.user.username}." />
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="osu!Pulse - {data.user.username}'s flow" />
+	<meta name="twitter:description" content="Find similar beatmaps for {data.user.username}." />
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content="osu!Pulse - {data.user.username}'s flow" />
+	<meta property="og:description" content="Find similar beatmaps for {data.user.username}." />
+	<meta property="og:url" content="https://pulse.layendan.dev" />
+	<meta property="og:site_name" content="osu!Pulse" />
+	<meta property="og:locale" content="en_US" />
+	<meta property="og:image" content={data.user.avatar_url} />
+	<meta property="og:image:alt" content="{data.user.username} avatar" />
+	<meta property="og:image:secure_url" content={data.user.avatar_url} />
 </svelte:head>
 
 <div class="bg-base-200 container mx-auto gap-2 overflow-clip rounded-xl" id="main">

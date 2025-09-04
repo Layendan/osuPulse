@@ -228,11 +228,11 @@ def insert_beatmaps_into_milvus(collection):
     # Flush to make sure data is persisted
     collection.flush()
 
-    # Create HNSW index on embedding vector field for nearest neighbor search
+    # Create HNSW_SQ index on embedding vector field for nearest neighbor search
     index_params = {
-        "index_type": "HNSW",
+        "index_type": "HNSW_SQ",
         "metric_type": "L2",
-        "params": {"M": 16, "efConstruction": 200},
+        "params": {"M": 8, "efConstruction": 32}
     }
     collection.create_index(field_name="embedding", index_params=index_params)
 
