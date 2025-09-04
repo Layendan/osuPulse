@@ -2,6 +2,7 @@ import type { UserNeighbor } from '$lib';
 
 import { error } from '@sveltejs/kit';
 import { query } from '$app/server';
+import { EMBED_API_URL } from '$env/static/private';
 import { number } from 'valibot';
 
 type NeighborResponse = {
@@ -10,7 +11,7 @@ type NeighborResponse = {
 };
 
 export const getUserNeighbors = query(number(), async (userId) => {
-	const url = new URL('http://127.0.0.1:8000/user_top_neighbors/');
+	const url = new URL(`http://${EMBED_API_URL}/user_top_neighbors/`);
 	const response = await fetch(url, {
 		method: 'POST',
 		headers: {
