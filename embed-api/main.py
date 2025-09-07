@@ -92,6 +92,7 @@ search_params = {"metric_type": "L2", "params": {"ef": 64}}
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     client = MilvusClient(os.environ.get("MILVUS_URL", "http://localhost:19530"))
+    client.load_collection(collection_name=COLLECTION_NAME)
 
     # Create aiosu client
     aiosu_client = aiosu.v2.Client(
