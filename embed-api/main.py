@@ -86,12 +86,12 @@ class UserRequest(BaseModel):
     top_n_neighbors: int = 50
 
 
-search_params = {"metric_type": "L2", "params": {"ef": 32}}
+search_params = {"metric_type": "L2", "params": {"ef": 64}}
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    client = MilvusClient("./milvus_lite.db")
+    client = MilvusClient(os.environ.get("MILVUS_URL", "http://localhost:19530"))
 
     # Create aiosu client
     aiosu_client = aiosu.v2.Client(
@@ -235,9 +235,9 @@ def insert_beatmaps_into_milvus(client):
     index_params = client.prepare_index_params()
     index_params.add_index(
         field_name="embedding",
-        index_type="FLAT",
+        index_type="HNSW",
         metric_type="L2",
-        params={"M": 8, "efConstruction": 32},
+        params={"M": 16, "efConstruction": 200},
     )
 
     client.create_index(collection_name=COLLECTION_NAME, index_params=index_params)

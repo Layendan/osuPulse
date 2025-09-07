@@ -10,6 +10,7 @@
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import UserSearch from '$lib/components/UserSearch.svelte';
 	import { faStar } from '@fortawesome/free-solid-svg-icons';
+	import { replaceState } from '$app/navigation';
 	import { buildUrl, getEnumMods, getModsEnum } from 'osu-web.js';
 	import Fa from 'svelte-fa';
 	import { flip } from 'svelte/animate';
@@ -23,6 +24,8 @@
 	let enumMods = $derived(getEnumMods(mods));
 
 	let addModModal: HTMLDialogElement | undefined = $state(undefined);
+
+	$effect(() => replaceState(`./?mods=${mods}`, {}));
 
 	function tooltip(
 		content: string,
@@ -111,6 +114,14 @@
 		<div class="flex flex-col justify-around gap-2 text-center 2xl:justify-self-end">
 			<h2 class="text-4xl font-bold 2xl:text-end">similar beatmaps</h2>
 			<div class="inline-flex flex-row flex-wrap justify-center gap-2 2xl:justify-end">
+				<a
+					href="osu://b/{data.beatmap.id}"
+					class="btn btn-soft btn-secondary"
+					{@attach tooltip('open in osu!direct', {
+						placement: 'bottom'
+					})}>
+					download beatmap
+				</a>
 				<ShareButton />
 				<button
 					onclick={() =>
