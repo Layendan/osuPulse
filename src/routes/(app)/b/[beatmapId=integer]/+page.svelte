@@ -26,7 +26,7 @@
 
 	let addModModal: HTMLDialogElement | undefined = $state(undefined);
 
-	$effect(() => pushState(`./?mods=${mods}`, page.state));
+	$effect(() => pushState(`${data.beatmap.id}/?mods=${mods}`, page.state));
 
 	function tooltip(
 		content: string,
