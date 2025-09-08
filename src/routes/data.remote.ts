@@ -72,6 +72,11 @@ export const navigateToUser = form(async (data) => {
 					break;
 				case 'unexpected_response': {
 					const response = e.response();
+
+					if (response.status === 404) {
+						error(404, 'User not found');
+					}
+
 					const text = await response.text();
 					console.error(response.status, text);
 					error(response.status, text);
@@ -111,6 +116,11 @@ export const navigateToUserFlow = form(async (data) => {
 					break;
 				case 'unexpected_response': {
 					const response = e.response();
+
+					if (response.status === 404) {
+						error(404, 'User not found');
+					}
+
 					const text = await response.text();
 					console.error(response.status, text);
 					error(response.status, text);

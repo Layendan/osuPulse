@@ -14,7 +14,7 @@
 				await submit();
 			} catch (e) {
 				console.error(e);
-				beatmapError = (e as FormError).body.message;
+				beatmapError = `${(e as FormError).status}: ${(e as FormError).body.message}`;
 			}
 		})}>
 		<div class="join">
