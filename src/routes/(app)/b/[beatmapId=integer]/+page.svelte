@@ -7,9 +7,10 @@
 	import Beatmap from '$lib/components/Beatmap.svelte';
 	import BeatmapSearch from '$lib/components/BeatmapSearch.svelte';
 	import Mod from '$lib/components/Mod.svelte';
+	import RefetchButton from '$lib/components/RefetchButton.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import UserSearch from '$lib/components/UserSearch.svelte';
-	import { faStar } from '@fortawesome/free-solid-svg-icons';
+	import { faFileArrowDown, faStar } from '@fortawesome/free-solid-svg-icons';
 	import { pushState } from '$app/navigation';
 	import { page } from '$app/state';
 	import { buildUrl, getEnumMods, getModsEnum } from 'osu-web.js';
@@ -21,12 +22,15 @@
 
 	let { data }: PageProps = $props();
 
-	let mods = $derived(data.mods);
+	let mods = $derived(page.state.mods ?? data.mods);
 	let enumMods = $derived(getEnumMods(mods));
+	let url = $derived.by(() => {
+		const url = new URL(page.url);
+		url.searchParams.set('mods', mods.toString());
+		return url.href;
+	});
 
 	let addModModal: HTMLDialogElement | undefined = $state(undefined);
-
-	$effect(() => pushState(`/b/${data.beatmap.id}?mods=${mods}`, page.state));
 
 	function tooltip(
 		content: string,
@@ -38,7 +42,7 @@
 
 			if (updateContent)
 				$effect(() => {
-					element && tooltip.setContent(updateContent());
+					if (element) tooltip.setContent(updateContent());
 				});
 
 			return () => tooltip.destroy();
@@ -121,24 +125,15 @@
 					{@attach tooltip('open in osu!direct', {
 						placement: 'bottom'
 					})}>
+					<Fa icon={faFileArrowDown} />
 					download beatmap
 				</a>
-				<ShareButton />
-				<button
-					onclick={() =>
-						getBeatmapNeighbors({ beatmapId: data.beatmap.id, mods: data.mods }).refresh()}
-					class="btn btn-warning btn-soft"
-					disabled={getBeatmapNeighbors({ beatmapId: data.beatmap.id, mods: data.mods }).loading}
-					aria-disabled={getBeatmapNeighbors({ beatmapId: data.beatmap.id, mods: data.mods })
-						.loading}
-					{@attach tooltip('refresh osu! data', {
-						placement: 'bottom'
-					})}>
-					{#if getBeatmapNeighbors({ beatmapId: data.beatmap.id, mods: data.mods }).loading}
-						<span class="loading loading-ring"></span>
-					{/if}
-					refetch data
-				</button>
+				<ShareButton {url} />
+				<RefetchButton
+					queryFunction={getBeatmapNeighbors({
+						beatmapId: data.beatmap.id,
+						mods
+					})} />
 			</div>
 		</div>
 		<div class="flex flex-row flex-wrap gap-2 max-2xl:justify-center">
@@ -183,6 +178,7 @@
 											})
 										);
 									}
+									pushState(`/b/${data.beatmap.id}?mods=${mods}`, { ...page.state, mods });
 								}}
 								class="cursor-pointer transition-opacity"
 								class:opacity-20={!included}>

@@ -2,10 +2,12 @@
 	import type { Attachment } from 'svelte/attachments';
 	import type { Props } from 'tippy.js';
 
-	import { faCheck } from '@fortawesome/free-solid-svg-icons';
+	import { faCheck, faLink } from '@fortawesome/free-solid-svg-icons';
 	import { page } from '$app/state';
 	import Fa from 'svelte-fa';
 	import tippy from 'tippy.js';
+
+	let { url }: { url?: string } = $props();
 
 	let clicked = $state(false);
 
@@ -23,7 +25,7 @@
 
 			if (updateContent)
 				$effect(() => {
-					element && tooltip.setContent(updateContent());
+					if (element) tooltip.setContent(updateContent());
 				});
 
 			return () => tooltip.destroy();
@@ -43,12 +45,10 @@
 		updateContent
 	)}
 	onclick={() => {
-		navigator.clipboard.writeText(page.url.href);
+		navigator.clipboard.writeText(url ?? page.url.href);
 		clicked = true;
 		setTimeout(() => (clicked = false), 5000);
 	}}>
-	{#if clicked}
-		<Fa icon={faCheck} />
-	{/if}
+	<Fa icon={clicked ? faCheck : faLink} />
 	{clicked ? 'shared' : 'share'} page
 </button>

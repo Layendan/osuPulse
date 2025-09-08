@@ -5,9 +5,12 @@
 
 	import Beatmap from '$lib/components/Beatmap.svelte';
 	import BeatmapSearch from '$lib/components/BeatmapSearch.svelte';
+	import RefetchButton from '$lib/components/RefetchButton.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import UserSearch from '$lib/components/UserSearch.svelte';
+	import { faUser } from '@fortawesome/free-solid-svg-icons';
 	import { buildUrl } from 'osu-web.js';
+	import Fa from 'svelte-fa';
 	import { flip } from 'svelte/animate';
 	import { fade } from 'svelte/transition';
 	import tippy from 'tippy.js';
@@ -97,22 +100,11 @@
 					{@attach tooltip(`beatmaps from ${data.user.username}'s play session`, {
 						placement: 'bottom'
 					})}>
+					<Fa icon={faUser} />
 					{data.user.username}'s profile
 				</a>
 				<ShareButton />
-				<button
-					onclick={() => getUserFlowNeighbors(data.user.id).refresh()}
-					class="btn btn-warning btn-soft"
-					disabled={getUserFlowNeighbors(data.user.id).loading}
-					aria-disabled={getUserFlowNeighbors(data.user.id).loading}
-					{@attach tooltip('refresh osu! data', {
-						placement: 'bottom'
-					})}>
-					{#if getUserFlowNeighbors(data.user.id).loading}
-						<span class="loading loading-ring"></span>
-					{/if}
-					refetch data
-				</button>
+				<RefetchButton queryFunction={getUserFlowNeighbors(data.user.id)} />
 			</div>
 		</div>
 		<div class="flex flex-row flex-wrap gap-2 max-2xl:justify-center">

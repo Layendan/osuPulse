@@ -8,6 +8,12 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
+
+	namespace App {
+		interface PageState {
+			mods: number | undefined;
+		}
+	}
 }
 
 export {};

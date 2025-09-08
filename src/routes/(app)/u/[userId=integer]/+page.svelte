@@ -5,9 +5,12 @@
 
 	import Beatmap from '$lib/components/Beatmap.svelte';
 	import BeatmapSearch from '$lib/components/BeatmapSearch.svelte';
+	import RefetchButton from '$lib/components/RefetchButton.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import UserSearch from '$lib/components/UserSearch.svelte';
+	import { faWater } from '@fortawesome/free-solid-svg-icons';
 	import { buildUrl } from 'osu-web.js';
+	import Fa from 'svelte-fa';
 	import { flip } from 'svelte/animate';
 	import { fade } from 'svelte/transition';
 	import tippy from 'tippy.js';
@@ -86,7 +89,7 @@
 
 	<div class="bg-base-300 grid grid-cols-1 items-center gap-4 p-4 2xl:grid-cols-2">
 		<div class="flex flex-col justify-around gap-2 text-center 2xl:justify-self-end">
-			<h2 class="text-4xl font-bold 2xl:text-end">recommended beatmaps</h2>
+			<h2 class="text-4xl font-bold 2xl:text-end">we think you'd like these</h2>
 			<div class="inline-flex flex-row flex-wrap justify-center gap-2 2xl:justify-end">
 				<a
 					href="{data.user.id}/flow"
@@ -94,25 +97,14 @@
 					{@attach tooltip(`beatmaps from ${data.user.username}'s play session`, {
 						placement: 'bottom'
 					})}>
+					<Fa icon={faWater} />
 					<div
 						class="from-primary to-secondary group-hover:text-primary-content group-focus-within:text-primary-content group-disabled:text-neutral-content bg-gradient-to-r bg-clip-text text-transparent group-disabled:opacity-20">
 						{data.user.username}'s flow
 					</div>
 				</a>
 				<ShareButton />
-				<button
-					onclick={() => getUserNeighbors(data.user.id).refresh()}
-					class="btn btn-warning btn-soft"
-					disabled={getUserNeighbors(data.user.id).loading}
-					aria-disabled={getUserNeighbors(data.user.id).loading}
-					{@attach tooltip('refresh osu! data', {
-						placement: 'bottom'
-					})}>
-					{#if getUserNeighbors(data.user.id).loading}
-						<span class="loading loading-ring"></span>
-					{/if}
-					refetch data
-				</button>
+				<RefetchButton queryFunction={getUserNeighbors(data.user.id)} />
 			</div>
 		</div>
 		<div class="flex flex-row flex-wrap gap-2 max-2xl:justify-center">

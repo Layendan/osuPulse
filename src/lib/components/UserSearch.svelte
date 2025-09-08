@@ -22,7 +22,7 @@
 				name="user"
 				type="text"
 				class="input join-item input-ghost bg-base-100"
-				placeholder="user URL" />
+				placeholder="username or id" />
 			<button type="submit" class="btn join-item btn-soft btn-primary">search</button>
 		</div>
 		{#if userError}
