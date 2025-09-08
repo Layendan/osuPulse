@@ -96,8 +96,8 @@ services:
     env_file:
       - .env
     volumes:
-      - home/layendan/app-data/pulse/beatmap_downloads:/app/beatmap_downloads
-      - home/layendan/app-data/pulse/skills_outputs:/app/skills_outputs
+      - /home/layendan/app-data/pulse/beatmap_downloads:/app/beatmap_downloads
+      - /home/layendan/app-data/pulse/skills_outputs:/app/skills_outputs
     expose:
       - '8000'
     depends_on:
