@@ -17,7 +17,7 @@
 				await submit();
 			} catch (e) {
 				console.error(e);
-				flowError = `${(e as FormError).status}: ${(e as FormError).body.message}`;
+				flowError = (e as FormError).body.message;
 			}
 		})}>
 		<div class="join">
