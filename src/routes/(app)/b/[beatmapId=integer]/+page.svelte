@@ -10,7 +10,8 @@
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import UserSearch from '$lib/components/UserSearch.svelte';
 	import { faStar } from '@fortawesome/free-solid-svg-icons';
-	import { replaceState } from '$app/navigation';
+	import { pushState } from '$app/navigation';
+	import { page } from '$app/state';
 	import { buildUrl, getEnumMods, getModsEnum } from 'osu-web.js';
 	import Fa from 'svelte-fa';
 	import { flip } from 'svelte/animate';
@@ -25,7 +26,7 @@
 
 	let addModModal: HTMLDialogElement | undefined = $state(undefined);
 
-	$effect(() => replaceState(`./?mods=${mods}`, {}));
+	$effect(() => pushState(`./?mods=${mods}`, page.state));
 
 	function tooltip(
 		content: string,
@@ -184,7 +185,7 @@
 									}
 								}}
 								class="cursor-pointer transition-opacity"
-								class:opacity-20={included}>
+								class:opacity-20={!included}>
 								<Mod
 									mod={modVal}
 									{@attach tooltip(
