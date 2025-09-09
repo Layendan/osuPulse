@@ -18,8 +18,8 @@
 
 	let { data }: PageProps = $props();
 
-	let globalRank = $state(data.user.statistics.global_rank);
-	let countryRank = $state(data.user.statistics.country_rank);
+	let globalRank = $derived(data.user.statistics.global_rank);
+	let countryRank = $derived(data.user.statistics.country_rank);
 
 	function tooltip(content: string, props?: Partial<Props>): Attachment {
 		return (element) => {
