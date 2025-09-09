@@ -18,8 +18,8 @@
 
 	let { data }: PageProps = $props();
 
-	const globalRank = data.user.statistics.global_rank;
-	const countryRank = data.user.statistics.country_rank;
+	let globalRank = $state(data.user.statistics.global_rank);
+	let countryRank = $state(data.user.statistics.country_rank);
 
 	function tooltip(content: string, props?: Partial<Props>): Attachment {
 		return (element) => {
@@ -66,18 +66,22 @@
 			<div class="inline-flex flex-col gap-2">
 				<h1 class="text-3xl font-bold md:text-5xl">{data.user.username}</h1>
 				<span class="inline-flex gap-4">
-					{#if globalRank}
-						<h2 class="text-3xl font-light">
-							<legend class="text-xs">Global Ranking</legend>
+					<h2 class="text-3xl font-light">
+						<legend class="text-xs">Global Ranking</legend>
+						{#if globalRank}
 							#{new Intl.NumberFormat().format(globalRank)}
-						</h2>
-					{/if}
-					{#if countryRank}
-						<h2 class="text-3xl font-light max-md:hidden">
-							<legend class="text-xs">Country Ranking</legend>
+						{:else}
+							-
+						{/if}
+					</h2>
+					<h2 class="text-3xl font-light max-md:hidden">
+						<legend class="text-xs">Country Ranking</legend>
+						{#if countryRank}
 							#{new Intl.NumberFormat().format(countryRank)}
-						</h2>
-					{/if}
+						{:else}
+							-
+						{/if}
+					</h2>
 					<h2 class="text-3xl font-light max-sm:hidden">
 						<legend class="text-xs">Performance Points</legend>
 						{new Intl.NumberFormat().format(parseInt(data.user.statistics.pp.toFixed(0)))}pp
