@@ -89,7 +89,7 @@
 
 	<div class="bg-base-300 grid grid-cols-1 items-center gap-4 p-4 2xl:grid-cols-2">
 		<div class="flex flex-col justify-around gap-2 text-center 2xl:justify-self-end">
-			<h2 class="text-4xl font-bold 2xl:text-end">we think you'd like these</h2>
+			<h2 class="text-4xl font-bold 2xl:text-end">we think you'd like these beatmaps</h2>
 			<div class="inline-flex flex-row flex-wrap justify-center gap-2 2xl:justify-end">
 				<a
 					href="{data.user.id}/flow"

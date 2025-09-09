@@ -3,6 +3,7 @@
 
 	import { navigateToUserFlow } from '../../routes/data.remote';
 
+	let submitting: boolean = $state(false);
 	let flowError: string | null = $state(null);
 </script>
 
@@ -14,10 +15,13 @@
 	<form
 		{...navigateToUserFlow.enhance(async ({ submit }) => {
 			try {
+				submitting = true;
 				await submit();
 			} catch (e) {
 				console.error(e);
 				flowError = (e as FormError).body.message;
+			} finally {
+				submitting = false;
 			}
 		})}>
 		<div class="join">
@@ -26,7 +30,16 @@
 				type="text"
 				class="input join-item input-ghost bg-base-100"
 				placeholder="username or id" />
-			<button type="submit" class="btn join-item btn-soft btn-primary">search</button>
+			<button
+				type="submit"
+				class="btn join-item btn-soft btn-primary"
+				disabled={submitting}
+				aria-disabled={submitting}>
+				{#if submitting}
+					<span class="loading loading-ring"></span>
+				{/if}
+				search
+			</button>
 		</div>
 		{#if flowError}
 			<div class="validator-hint text-error visible">{flowError}</div>

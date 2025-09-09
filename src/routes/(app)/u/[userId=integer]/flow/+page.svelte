@@ -97,7 +97,7 @@
 				<a
 					href="../{data.user.id}"
 					class="btn btn-soft btn-primary group"
-					{@attach tooltip(`beatmaps from ${data.user.username}'s play session`, {
+					{@attach tooltip(`beatmaps from ${data.user.username}'s top plays`, {
 						placement: 'bottom'
 					})}>
 					<Fa icon={faUser} />

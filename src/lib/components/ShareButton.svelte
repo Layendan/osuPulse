@@ -34,7 +34,7 @@
 </script>
 
 <button
-	class="btn btn-soft btn-accent"
+	class="btn btn-soft btn-accent group"
 	class:btn-success={clicked}
 	{@attach tooltip(
 		updateContent(),
@@ -49,6 +49,6 @@
 		clicked = true;
 		setTimeout(() => (clicked = false), 5000);
 	}}>
-	<Fa icon={clicked ? faCheck : faLink} />
+	<Fa icon={clicked ? faCheck : faLink} class="group-hover:animate-bounce" />
 	{clicked ? 'shared' : 'share'} page
 </button>
