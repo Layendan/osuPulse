@@ -139,8 +139,9 @@
 			{/snippet}
 
 			{#snippet failed(error, reset)}
+				{@const errorVar: {status: number, body: {message: string}} = (error as typeof errorVar)}
 				<div class="flex flex-col gap-2">
-					something went wrong - {error}
+					something went wrong - {errorVar.status}: {errorVar.body.message}
 					<button class="btn btn-outline btn-warning" onclick={reset}> try again </button>
 				</div>
 			{/snippet}
