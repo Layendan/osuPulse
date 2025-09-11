@@ -4,11 +4,12 @@ import glob
 import os
 import shutil
 import subprocess
+import time
 import zipfile
 from collections import defaultdict
 from contextlib import asynccontextmanager
 from math import log2
-import time
+from typing import Any, Dict, List
 
 import aiohttp
 import aiosu
@@ -94,7 +95,6 @@ async def lifespan(app: FastAPI):
     client = MilvusClient(os.environ.get("MILVUS_URL", "http://localhost:19530"))
     client.load_collection(collection_name=COLLECTION_NAME)
 
-    # Create aiosu client
     aiosu_client = aiosu.v2.Client(
         client_id=int(os.getenv("OSU_CLIENT_ID")),
         client_secret=os.getenv("OSU_CLIENT_SECRET"),
@@ -107,9 +107,8 @@ async def lifespan(app: FastAPI):
 
     yield
 
-    # Cleanup
     await aiosu_client.aclose()
-    client.close();
+    client.close()
     ingest_task.cancel()
 
 
@@ -147,8 +146,11 @@ def extract_osz_files(pack_dir):
 
 
 def beatmapset_exists_in_milvus(client, beatmapsetid):
-    results = client.query(collection_name=COLLECTION_NAME,
-        filter=f"BeatmapsetID == {beatmapsetid}", output_fields=["BeatmapsetID"], limit=1
+    results = client.query(
+        collection_name=COLLECTION_NAME,
+        filter=f"BeatmapsetID == {beatmapsetid}",
+        output_fields=["BeatmapsetID"],
+        limit=1,
     )
     return len(results) > 0
 
@@ -203,7 +205,6 @@ def insert_beatmaps_into_milvus(client):
     for col in SKILL_COLUMNS:
         combined_df[col] = combined_df[col].replace([np.nan, np.inf, -np.inf], 0.0)
 
-
     def clean_embedding(vec):
         return [float(x) if (pd.notnull(x) and np.isfinite(x)) else 0.0 for x in vec]
 
@@ -230,9 +231,6 @@ def insert_beatmaps_into_milvus(client):
         print(f"Batch {i+1}/{num_batches} inserted")
         time.sleep(0.2)  # short delay to reduce ping frequency
 
-    # Persist data
-    client.flush(COLLECTION_NAME)
-
     index_params = client.prepare_index_params()
     index_params.add_index(
         field_name="embedding",
@@ -248,7 +246,7 @@ def insert_beatmaps_into_milvus(client):
     )
 
 
-async def process_new_ranked_maps(client, aiosu_client):
+async def process_new_ranked_maps(client: MilvusClient, aiosu_client: aiosu.v2.Client):
     packs = await aiosu_client.get_beatmap_packs(
         type=aiosu.models.beatmap.BeatmapPackType.STANDARD
     )
@@ -381,7 +379,7 @@ def find_similar_beatmaps_by_id(
     return rows, query_skill_sum
 
 
-async def get_user_top_scores(client: aiosu.v2.Client, user_id, n_scores=100):
+async def get_user_top_scores(client: aiosu.v2.Client, user_id: int, n_scores=100):
     best_scores = await client.get_user_bests(
         user_id=user_id,
         mode=aiosu.models.gamemode.Gamemode.STANDARD,
@@ -403,11 +401,6 @@ async def get_user_top_scores(client: aiosu.v2.Client, user_id, n_scores=100):
     return result
 
 
-from typing import Any, Dict, List
-
-import aiosu
-
-
 async def get_user_recent_scores(
     client: aiosu.v2.Client, user_id: int, n_scores: int = 50
 ) -> List[Dict[str, Any]]:
@@ -418,15 +411,35 @@ async def get_user_recent_scores(
         new_format=True,
     )
 
-    return [
-        {
-            "beatmap": {"id": score.beatmap.id if score.beatmap else None},
-            "mods": [m.acronym.lower() for m in (score.mods or [])],
-            "accuracy": score.accuracy,
-        }
-        for score in best_scores
-        if score.beatmap.status == aiosu.models.BeatmapRankStatus.RANKED
-    ]
+    seen = {}
+    accuracy_bucket = defaultdict(list)
+    key_order = []
+
+    for score in best_scores:
+        if (
+            score.beatmap.status == aiosu.models.BeatmapRankStatus.RANKED
+            and score.pp is not None
+        ):
+            beatmap_id = score.beatmap.id if score.beatmap else None
+            mods = tuple(sorted([m.acronym.lower() for m in (score.mods or [])]))
+            key = (beatmap_id, mods)
+            accuracy_bucket[key].append(score.accuracy)
+            if key not in seen:
+                seen[key] = (beatmap_id, mods)
+                key_order.append(key)
+
+    result = []
+    for key in key_order:
+        beatmap_id, mods = key
+        avg_accuracy = sum(accuracy_bucket[key]) / len(accuracy_bucket[key])
+        result.append(
+            {
+                "beatmap": {"id": beatmap_id},
+                "mods": list(mods),
+                "accuracy": avg_accuracy,
+            }
+        )
+    return result
 
 
 def tally_neighbors(client: MilvusClient, user_scores: list, top_n_neighbors=50):
@@ -534,7 +547,7 @@ async def api_user_top_neighbors(req: UserRequest):
 
 
 @app.post("/user_flow/")
-async def api_user_top_neighbors(req: UserRequest):
+async def api_user_recent_neighbors(req: UserRequest):
     try:
         user_scores = await get_user_recent_scores(app.state.aiosu_client, req.user_id)
         summary = tally_neighbors(
