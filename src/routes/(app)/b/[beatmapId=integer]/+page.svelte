@@ -215,7 +215,13 @@
 						<Beatmap {neighbor} rank={i + 1} />
 					</li>
 				{:else}
-					<h2 class="col-span-2 text-center">no beatmaps found</h2>
+					<h2 class="col-span-2 text-center">
+						{#if data.beatmap.status !== 'ranked'}
+							currently, only ranked beatmaps are available
+						{:else}
+							no beatmaps found
+						{/if}
+					</h2>
 				{/each}
 			</ul>
 

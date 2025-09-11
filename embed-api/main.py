@@ -15,7 +15,7 @@ import aiohttp
 import aiosu
 import numpy as np
 import pandas as pd
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from pymilvus import MilvusClient
 from scipy.stats import norm, zscore
@@ -528,7 +528,7 @@ async def api_similar_beatmaps(beatmap_id: int, mods: int, top_n: int = 10):
         app.state.milvus_client, beatmap_id, mods, top_n
     )
     if rows is None:
-        return {"error": "No such beatmap found"}
+        raise HTTPException(status_code=404, detail="No beatmap found")
     return {"skill_sum": skill_sum, "neighbors": rows}
 
 
@@ -543,7 +543,7 @@ async def api_user_top_neighbors(req: UserRequest):
         )
         return {"user_id": req.user_id, "top_neighbors": summary}
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/user_flow/")
@@ -557,4 +557,4 @@ async def api_user_recent_neighbors(req: UserRequest):
         )
         return {"user_id": req.user_id, "top_neighbors": summary}
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=500, detail=str(e))

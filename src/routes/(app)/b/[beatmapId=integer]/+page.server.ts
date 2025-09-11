@@ -19,10 +19,6 @@ export const load = (async ({ params, url }) => {
 		error(400, 'Incorrect gamemode');
 	}
 
-	if (beatmap.ranked !== 1) {
-		error(400, 'Beatmap not ranked');
-	}
-
 	const mods = parseInt(url.searchParams.get('mods') ?? '0');
 
 	if (isNaN(mods)) {
