@@ -31,8 +31,7 @@
 		welcome to
 		<br />
 		<div
-			class="from-primary to-secondary inline-block bg-gradient-to-r bg-clip-text
-			{navigator.userAgent.match(/AppleWebKit/) ? 'text-primary' : 'text-transparent'}">
+			class="from-primary to-secondary text-primary ff-only:text-transparent inline-block bg-gradient-to-r bg-clip-text">
 			{#each title.split('') as char, i (i)}
 				<span
 					class="wave-bounce inline-block motion-reduce:animate-none"
