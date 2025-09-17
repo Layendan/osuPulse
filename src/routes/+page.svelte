@@ -34,7 +34,7 @@
 			class="from-primary to-secondary text-primary ff-only:text-transparent inline-block bg-gradient-to-r bg-clip-text">
 			{#each title.split('') as char, i (i)}
 				<span
-					class="wave-bounce inline-block motion-reduce:animate-none"
+					class="wave-bounce inline-block will-change-transform motion-reduce:animate-none"
 					style="animation-delay: {(i - title.length) * 100}ms">
 					{char}
 				</span>

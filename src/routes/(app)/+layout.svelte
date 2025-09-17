@@ -10,9 +10,13 @@
 
 <nav class="navbar bg-base-200 mb-4 shadow-sm">
 	<div class="container mx-auto inline-flex text-center">
-		<a href="/" class="inline-flex text-2xl font-bold">
-			<enhanced:img src={icon} alt="icon" class="mr-2 size-10" width="80" height="80"
-			></enhanced:img>
+		<a href="/" class="group inline-flex text-2xl font-bold">
+			<enhanced:img
+				src={icon}
+				alt="icon"
+				class="mr-2 size-10 transition-[scale] duration-200 group-hover:scale-110 motion-safe:group-hover:animate-pulse"
+				width="80"
+				height="80"></enhanced:img>
 			<h1
 				class="from-primary to-secondary inline-block bg-gradient-to-r bg-clip-text text-transparent">
 				osu!Pulse
