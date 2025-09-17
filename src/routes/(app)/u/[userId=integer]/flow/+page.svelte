@@ -8,7 +8,7 @@
 	import RefetchButton from '$lib/components/RefetchButton.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import UserSearch from '$lib/components/UserSearch.svelte';
-	import { faUser } from '@fortawesome/free-solid-svg-icons';
+	import { faInfoCircle, faUser } from '@fortawesome/free-solid-svg-icons';
 	import { buildUrl } from 'osu-web.js';
 	import Fa from 'svelte-fa';
 	import { flip } from 'svelte/animate';
@@ -96,6 +96,14 @@
 			<h2
 				class="from-primary to-secondary bg-gradient-to-r bg-clip-text text-4xl font-bold text-transparent 2xl:text-end">
 				{data.user.username}'s flow
+				<button
+					class="text-base-content cursor-context-menu text-xl"
+					{@attach tooltip(
+						'these beatmaps are similar to your recent plays, weighted towards your most recent scores',
+						{ placement: 'bottom' }
+					)}>
+					<Fa icon={faInfoCircle} />
+				</button>
 			</h2>
 			<div class="inline-flex flex-row flex-wrap justify-center gap-2 2xl:justify-end">
 				<a

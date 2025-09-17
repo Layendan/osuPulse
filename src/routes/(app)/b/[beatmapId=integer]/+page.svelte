@@ -10,7 +10,7 @@
 	import RefetchButton from '$lib/components/RefetchButton.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import UserSearch from '$lib/components/UserSearch.svelte';
-	import { faFileArrowDown, faStar } from '@fortawesome/free-solid-svg-icons';
+	import { faFileArrowDown, faInfoCircle, faStar } from '@fortawesome/free-solid-svg-icons';
 	import { pushState } from '$app/navigation';
 	import { page } from '$app/state';
 	import { buildUrl, getEnumMods, getModsEnum } from 'osu-web.js';
@@ -117,7 +117,17 @@
 
 	<div class="bg-base-300 grid grid-cols-1 items-center gap-4 p-4 2xl:grid-cols-2">
 		<div class="flex flex-col justify-around gap-2 text-center 2xl:justify-self-end">
-			<h2 class="text-4xl font-bold 2xl:text-end">similar beatmaps</h2>
+			<h2 class="text-4xl font-bold 2xl:text-end">
+				similar beatmaps
+				<button
+					class="cursor-context-menu text-xl"
+					{@attach tooltip(
+						`these beatmaps are the most similar to ${data.beatmap.beatmapset.title}, based on the estimated skills required to pass it (accuracy, aim, flashlight, precision, reaction, stamina, and streams)`,
+						{ placement: 'bottom' }
+					)}>
+					<Fa icon={faInfoCircle} />
+				</button>
+			</h2>
 			<div class="inline-flex flex-row flex-wrap justify-center gap-2 2xl:justify-end">
 				<a
 					href="osu://b/{data.beatmap.id}"

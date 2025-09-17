@@ -42,5 +42,5 @@
 			<div class="validator-hint text-error visible">{userError}</div>
 		{/if}
 	</form>
-	<p class="label">find maps that you might like</p>
+	<p class="label">find maps that you might like based on top plays</p>
 </fieldset>
