@@ -1,11 +1,21 @@
 <script lang="ts">
+	import type { Attachment } from 'svelte/attachments';
+	import type { Props } from 'tippy.js';
+
 	import icon from '$lib/assets/icon.png?enhanced';
 	import { faDiscord, faGithub } from '@fortawesome/free-brands-svg-icons';
 	import Fa from 'svelte-fa';
-
-	import 'tippy.js/dist/tippy.css';
+	import tippy from 'tippy.js';
 
 	let { children } = $props();
+
+	function tooltip(content: string, props?: Partial<Props>): Attachment {
+		return (element) => {
+			const tooltip = tippy(element, { ...props, content });
+
+			return () => tooltip.destroy();
+		};
+	}
 </script>
 
 <nav class="navbar bg-base-200 mb-4 shadow-sm">
@@ -35,14 +45,16 @@
 				href="https://discord.gg/smyaYEM7V4"
 				target="_blank"
 				rel="noopener noreferrer"
-				class="text-2xl">
+				class="text-2xl"
+				{@attach tooltip('discord')}>
 				<Fa icon={faDiscord} />
 			</a>
 			<a
 				href="https://github.com/Layendan/OsuPulse"
 				target="_blank"
 				rel="noopener noreferrer"
-				class="text-2xl">
+				class="text-2xl"
+				{@attach tooltip('github')}>
 				<Fa icon={faGithub} />
 			</a>
 		</div>

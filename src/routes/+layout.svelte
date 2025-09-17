@@ -6,6 +6,8 @@
 	import { navigating } from '$app/state';
 	import NProgress from 'nprogress';
 
+	import 'tippy.js/dist/tippy.css';
+
 	let { children } = $props();
 
 	NProgress.configure({
