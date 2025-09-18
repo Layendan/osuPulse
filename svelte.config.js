@@ -10,6 +10,18 @@ const config = {
 		adapter: adapter(),
 		experimental: {
 			remoteFunctions: true
+		},
+		csp: {
+			// default-src 'self'; img-src 'self' https://*.ppy.sh; connect-src 'self' https://*.ppy.sh; frame-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content;
+			directives: {
+				'default-src': ['self'],
+				'img-src': ['self', 'https://*.ppy.sh'],
+				'connect-src': ['self', 'https://*.ppy.sh'],
+				'frame-src': ['none'],
+				'frame-ancestors': ['none'],
+				'upgrade-insecure-requests': true
+			},
+			mode: 'hash'
 		}
 	},
 	compilerOptions: {
