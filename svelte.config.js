@@ -12,11 +12,12 @@ const config = {
 			remoteFunctions: true
 		},
 		csp: {
-			// default-src 'self'; img-src 'self' https://*.ppy.sh; connect-src 'self' https://*.ppy.sh; frame-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content;
+			// default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.ppy.sh; connect-src 'self' https://*.ppy.sh https://static.cloudflareinsights.com; frame-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content;
 			directives: {
 				'default-src': ['self'],
-				'img-src': ['self', 'https://*.ppy.sh'],
-				'connect-src': ['self', 'https://*.ppy.sh'],
+				'style-src': ['self', 'unsafe-inline'],
+				'img-src': ['self', 'data:', 'https://*.ppy.sh'],
+				'connect-src': ['self', 'https://*.ppy.sh', 'https://static.cloudflareinsights.com'],
 				'frame-src': ['none'],
 				'frame-ancestors': ['none'],
 				'upgrade-insecure-requests': true
