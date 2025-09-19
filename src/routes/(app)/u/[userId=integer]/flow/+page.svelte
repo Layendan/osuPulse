@@ -56,7 +56,8 @@
 		<img
 			src={data.user.cover.custom_url ?? data.user.cover.url}
 			class="absolute h-full w-full object-cover"
-			alt="user cover" />
+			alt="user cover"
+			fetchpriority="high" />
 		<div class="bg-base-100/80 absolute h-full w-full backdrop-blur-xs"></div>
 		<div class="z-10 my-2 inline-flex items-center gap-4">
 			<img

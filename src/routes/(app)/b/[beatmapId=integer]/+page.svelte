@@ -84,7 +84,8 @@
 		<img
 			src={data.beatmap.beatmapset.covers['cover@2x']}
 			class="absolute h-full w-full object-cover"
-			alt="beatmap cover" />
+			alt="beatmap cover"
+			fetchpriority="high" />
 		<div class="bg-base-100/80 absolute h-full w-full backdrop-blur-xs"></div>
 		<div class="z-10 my-2 inline-flex items-center gap-4">
 			<img
