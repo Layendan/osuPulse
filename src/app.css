@@ -38,42 +38,36 @@
 
 @font-face {
 	font-family: Torus;
-	font-display: swap;
 	src: url('/fonts/Torus-Regular.otf') format('opentype');
 	font-weight: normal;
 }
 
 @font-face {
 	font-family: Torus;
-	font-display: swap;
 	src: url('/fonts/Torus-Bold.otf') format('opentype');
 	font-weight: bold;
 }
 
 @font-face {
 	font-family: Torus;
-	font-display: swap;
 	src: url('/fonts/Torus-Heavy.otf') format('opentype');
 	font-weight: 800;
 }
 
 @font-face {
 	font-family: Torus;
-	font-display: swap;
 	src: url('/fonts/Torus-Light.otf') format('opentype');
 	font-weight: 300;
 }
 
 @font-face {
 	font-family: Torus;
-	font-display: swap;
 	src: url('/fonts/Torus-SemiBold.otf') format('opentype');
 	font-weight: 600;
 }
 
 @font-face {
 	font-family: Torus;
-	font-display: swap;
 	src: url('/fonts/Torus-Thin.otf') format('opentype');
 	font-weight: 100;
 }
