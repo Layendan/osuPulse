@@ -75,7 +75,7 @@
 					rel="noopener noreferrer"
 					class="link link-primary">
 					osu!Skills
-				</a>, players can find similar breatmaps per skillset and then expand those to their top
+				</a>, players can find similar beatmaps per skillset and then expand those to their top
 				plays and recently played beatmaps.
 			</p>
 		</fieldset>

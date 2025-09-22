@@ -24,7 +24,7 @@
   </a>
 </p>
 
-osu!Pulse is a project I've been working on in my spare time meant to help osu! players find fun maps. Using [Kuuuube's](https://github.com/Kuuuube/osu_skills_rs?tab=readme-ov-file) implementation of [osu!Skills](https://osuskills.com/), players can find similar breatmaps per skillset and then expand those to their top plays and recently played beatmaps.
+osu!Pulse is a project I've been working on in my spare time meant to help osu! players find fun maps. Using [Kuuuube's](https://github.com/Kuuuube/osu_skills_rs?tab=readme-ov-file) implementation of [osu!Skills](https://osuskills.com/), players can find similar beatmaps per skillset and then expand those to their top plays and recently played beatmaps.
 
 ## Table of Contents
 
