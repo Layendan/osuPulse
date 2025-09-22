@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { FormError } from '$lib';
 
-	import { navigateToUserFlow } from '../../routes/data.remote';
+	import { navigateToUserPulse } from '../../routes/data.remote';
 
 	let submitting: boolean = $state(false);
 	let flowError: string | null = $state(null);
@@ -13,7 +13,7 @@
 		pulse
 	</legend>
 	<form
-		{...navigateToUserFlow.enhance(async ({ submit }) => {
+		{...navigateToUserPulse.enhance(async ({ submit }) => {
 			try {
 				submitting = true;
 				await submit();

@@ -10,8 +10,8 @@ type NeighborResponse = {
 	top_neighbors: UserNeighbor[];
 };
 
-export const getUserFlowNeighbors = query(number(), async (userId) => {
-	const url = new URL(`${EMBED_API_URL}/user_flow/`);
+export const getUserPulseNeighbors = query(number(), async (userId) => {
+	const url = new URL(`${EMBED_API_URL}/user_pulse/`);
 	const response = await fetch(url, {
 		method: 'POST',
 		headers: {

@@ -14,7 +14,7 @@
 	import { flip } from 'svelte/animate';
 	import { fade } from 'svelte/transition';
 	import tippy from 'tippy.js';
-	import { getUserFlowNeighbors } from './data.remote';
+	import { getUserPulseNeighbors } from './data.remote';
 
 	let { data }: PageProps = $props();
 
@@ -31,13 +31,13 @@
 </script>
 
 <svelte:head>
-	<title>osu!Pulse - {data.user.username}'s flow</title>
+	<title>osu!Pulse - {data.user.username}'s pulse</title>
 	<meta name="description" content="Find similar beatmaps for {data.user.username}." />
 	<meta name="twitter:card" content="summary" />
-	<meta name="twitter:title" content="osu!Pulse - {data.user.username}'s flow" />
+	<meta name="twitter:title" content="osu!Pulse - {data.user.username}'s pulse" />
 	<meta name="twitter:description" content="Find similar beatmaps for {data.user.username}." />
 	<meta property="og:type" content="website" />
-	<meta property="og:title" content="osu!Pulse - {data.user.username}'s flow" />
+	<meta property="og:title" content="osu!Pulse - {data.user.username}'s pulse" />
 	<meta property="og:description" content="Find similar beatmaps for {data.user.username}." />
 	<meta property="og:url" content="https://pulse.layendan.dev" />
 	<meta property="og:site_name" content="osu!Pulse" />
@@ -96,7 +96,7 @@
 		<div class="flex flex-col justify-around gap-2 text-center 2xl:justify-self-end">
 			<h2
 				class="from-primary to-secondary bg-gradient-to-r bg-clip-text text-4xl font-bold text-transparent 2xl:text-end">
-				{data.user.username}'s flow
+				{data.user.username}'s pulse
 				<button
 					class="text-base-content cursor-context-menu text-xl"
 					{@attach tooltip(
@@ -117,7 +117,7 @@
 					{data.user.username}'s profile
 				</a>
 				<ShareButton />
-				<RefetchButton queryFunction={getUserFlowNeighbors(data.user.id)} />
+				<RefetchButton queryFunction={getUserPulseNeighbors(data.user.id)} />
 			</div>
 		</div>
 		<div class="flex flex-row flex-wrap gap-2 max-2xl:justify-center">
@@ -128,7 +128,7 @@
 
 	<div class="grid min-h-[60svh] place-items-center py-4">
 		<svelte:boundary>
-			{@const { top_neighbors } = await getUserFlowNeighbors(data.user.id)}
+			{@const { top_neighbors } = await getUserPulseNeighbors(data.user.id)}
 
 			<ul class="grid w-full grid-cols-1 gap-4 px-4 lg:grid-cols-2">
 				{#each top_neighbors as neighbor, i (`${neighbor.BeatmapID}-${neighbor.Mods}`)}
