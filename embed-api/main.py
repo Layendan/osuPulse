@@ -546,7 +546,7 @@ async def api_user_top_neighbors(req: UserRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/user_flow/")
+@app.post("/user_pulse/")
 async def api_user_recent_neighbors(req: UserRequest):
     try:
         user_scores = await get_user_recent_scores(app.state.aiosu_client, req.user_id)

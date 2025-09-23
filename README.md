@@ -1,38 +1,52 @@
-# sv
+<p align="center">
+    <img width="250" alt="osu!Pulse logo" src="static/logo.png"/>
+</p>
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+# osu!Pulse
 
-## Creating a project
+---
 
-If you're seeing this, you've probably already done this step. Congrats!
+<p align="center">
+  <a href="https://pulse.layendan.dev">
+    <img alt="Website" src="https://img.shields.io/website?url=https%3A%2F%2Fpulse.layendan.dev">
+  </a>
+  <a href="https://discord.gg/dzTVzeW">
+    <img alt="Discord" src="https://img.shields.io/discord/1412900730179944580?logo=discord&color=%235865F2">
+  </a>
+  <a href="https://www.codefactor.io/repository/github/layendan/osupulse">
+    <img alt="CodeFactor Grade" src="https://img.shields.io/codefactor/grade/github/Layendan/osuPulse">
+  </a>
+  <a href="https://developer.mozilla.org/en-US/observatory/analyze?host=pulse.layendan.dev">
+    <img alt="Mozilla HTTP Observatory Grade" src="https://img.shields.io/mozilla-observatory/grade/pulse.layendan.dev">
+  </a>
+  <a href="https://github.com/Layendan/osuPulse/blob/main/LICENSE">
+    <img alt="GitHub License" src="https://img.shields.io/github/license/Layendan/osuPulse">
+  </a>
+</p>
 
-```sh
-# create a new project in the current directory
-npx sv create
+osu!Pulse is a project I've been working on in my spare time meant to help osu! players find fun maps. Using [Kuuuube's](https://github.com/Kuuuube/osu_skills_rs?tab=readme-ov-file) implementation of [osu!Skills](https://osuskills.com/), players can find similar beatmaps per skillset and then expand those to their top plays and recently played beatmaps.
 
-# create a new project in my-app
-npx sv create my-app
-```
+## Table of Contents
 
-## Developing
+- [osu!Pulse](/#)
+  - [Table of Contents](#table-of-contents)
+  - [Contributing](#contributing)
+    - [Using Docker](#using-docker)
+    - [Local](#local)
+  - [License](#license)
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Contributing
 
-```sh
-npm run dev
+(Will add more on how to contribute later)
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+### Using Docker
 
-## Building
+(Placeholder)
 
-To create a production version of your app:
+### Local
 
-```sh
-npm run build
-```
+(Placeholder)
 
-You can preview the production build with `npm run preview`.
+## License
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+This project uses the [MIT License (MIT)](https://mit-license.org/)

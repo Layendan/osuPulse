@@ -10,6 +10,20 @@ const config = {
 		adapter: adapter(),
 		experimental: {
 			remoteFunctions: true
+		},
+		csp: {
+			// default-src 'self'; script-src 'self' static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.ppy.sh; connect-src 'self' cloudflareinsights.com https://*.ppy.sh; frame-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content;
+			directives: {
+				'default-src': ['self'],
+				'script-src': ['self', 'static.cloudflareinsights.com'],
+				'style-src': ['self', 'unsafe-inline'],
+				'img-src': ['self', 'data:', 'https://*.ppy.sh'],
+				'connect-src': ['self', 'cloudflareinsights.com', 'https://*.ppy.sh'],
+				'frame-src': ['none'],
+				'frame-ancestors': ['none'],
+				'upgrade-insecure-requests': true
+			},
+			mode: 'nonce'
 		}
 	},
 	compilerOptions: {

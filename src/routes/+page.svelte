@@ -3,7 +3,7 @@
 	import type { Props } from 'tippy.js';
 
 	import BeatmapSearch from '$lib/components/BeatmapSearch.svelte';
-	import FlowSearch from '$lib/components/FlowSearch.svelte';
+	import PulseSearch from '$lib/components/PulseSearch.svelte';
 	import UserSearch from '$lib/components/UserSearch.svelte';
 	import { faDiscord, faGithub } from '@fortawesome/free-brands-svg-icons';
 	import Fa from 'svelte-fa';
@@ -75,7 +75,7 @@
 					rel="noopener noreferrer"
 					class="link link-primary">
 					osu!Skills
-				</a>, players can find similar breatmaps per skillset and then expand those to their top
+				</a>, players can find similar beatmaps per skillset and then expand those to their top
 				plays and recently played beatmaps.
 			</p>
 		</fieldset>
@@ -84,7 +84,7 @@
 
 		<UserSearch />
 
-		<FlowSearch />
+		<PulseSearch />
 
 		<fieldset class="fieldset rounded-box border-base-300 bg-base-200 w-xs border p-4">
 			<legend class="fieldset-legend">socials</legend>

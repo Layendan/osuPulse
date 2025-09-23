@@ -2,7 +2,7 @@
 @custom-variant ff-only (@-moz-document url-prefix());
 @plugin "daisyui";
 @plugin "daisyui/theme" {
-	name: 'emoghost';
+	name: 'pulse';
 	default: true;
 	prefersdark: true;
 	color-scheme: 'dark';

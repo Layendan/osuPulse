@@ -56,7 +56,8 @@
 		<img
 			src={data.user.cover.custom_url ?? data.user.cover.url}
 			class="absolute h-full w-full object-cover"
-			alt="user cover" />
+			alt="user cover"
+			fetchpriority="high" />
 		<div class="bg-base-100/80 absolute h-full w-full backdrop-blur-xs"></div>
 		<div class="z-10 my-2 inline-flex items-center gap-4">
 			<img
@@ -106,7 +107,7 @@
 			</h2>
 			<div class="inline-flex flex-row flex-wrap justify-center gap-2 2xl:justify-end">
 				<a
-					href="{data.user.id}/flow"
+					href="{data.user.id}/pulse"
 					class="btn btn-soft btn-primary group"
 					{@attach tooltip(`beatmaps from ${data.user.username}'s play session`, {
 						placement: 'bottom'
@@ -114,7 +115,7 @@
 					<Fa icon={faWater} />
 					<div
 						class="from-primary to-secondary group-hover:text-primary-content group-focus-within:text-primary-content group-disabled:text-neutral-content bg-gradient-to-r bg-clip-text text-transparent group-disabled:opacity-20">
-						{data.user.username}'s flow
+						{data.user.username}'s pulse
 					</div>
 				</a>
 				<ShareButton />

@@ -82,7 +82,7 @@ export const navigateToUser = form(
 	}
 );
 
-export const navigateToUserFlow = form(
+export const navigateToUserPulse = form(
 	object({ user: pipe(string(), nonEmpty()) }),
 	async ({ user }) => {
 		let userData;
@@ -119,6 +119,6 @@ export const navigateToUserFlow = form(
 			error(500, 'Something went wrong');
 		}
 
-		redirect(303, `/u/${userData.id}/flow`);
+		redirect(303, `/u/${userData.id}/pulse`);
 	}
 );
