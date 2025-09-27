@@ -23,7 +23,7 @@ const config = {
 				'frame-ancestors': ['none'],
 				'upgrade-insecure-requests': true
 			},
-			mode: 'nonce'
+			mode: 'auto'
 		}
 	},
 	compilerOptions: {
