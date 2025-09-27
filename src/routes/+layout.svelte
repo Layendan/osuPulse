@@ -2,7 +2,6 @@
 	import '../app.css';
 	import '../nprogress.css';
 
-	import favicon from '$lib/assets/favicon.webp';
 	import { navigating } from '$app/state';
 	import NProgress from 'nprogress';
 
@@ -20,9 +19,5 @@
 		else NProgress.done();
 	});
 </script>
-
-<svelte:head>
-	<link rel="icon" href={favicon} />
-</svelte:head>
 
 {@render children?.()}
