@@ -51,93 +51,103 @@
 		</form>
 
 		<h3 class="mb-2 text-lg font-bold">exclude mods</h3>
-		<ul class="inline-flex flex-row gap-2">
+		<ul class="mb-2 inline-flex flex-row flex-wrap gap-2">
 			{#each ModsList as mod (mod)}
 				{@const [modVal] = getEnumMods(mod)}
 				{@const included = excludedEnumMods.includes(modVal)}
 				{@const updateContent = () => (included ? `remove ${modVal}` : `add ${modVal}`)}
+				<li>
+					<button
+						onclick={() => {
+							if (included)
+								excludedModsTemp = getModsEnum(excludedEnumMods.filter((item) => item !== modVal));
+							else {
+								excludedModsTemp = getModsEnum([...excludedEnumMods, modVal]);
+							}
+						}}
+						class="cursor-pointer transition-opacity"
+						class:opacity-20={!included}>
+						<Mod
+							mod={modVal}
+							{@attach tooltip(
+								updateContent(),
+								{
+									appendTo: filterModal
+								},
+								updateContent
+							)} />
+					</button>
+				</li>
+			{/each}
+			<li>
 				<button
 					onclick={() => {
-						if (included)
-							excludedModsTemp = getModsEnum(excludedEnumMods.filter((item) => item !== modVal));
-						else {
-							excludedModsTemp = getModsEnum([...excludedEnumMods, modVal]);
-						}
+						excludedModsTemp = undefined;
 					}}
-					class="cursor-pointer transition-opacity"
-					class:opacity-20={!included}>
-					<Mod
-						mod={modVal}
-						{@attach tooltip(
-							updateContent(),
-							{
-								appendTo: filterModal
-							},
-							updateContent
-						)} />
+					class="btn btn-warning btn-soft">
+					reset
 				</button>
-			{/each}
-			<button
-				onclick={() => {
-					excludedModsTemp = undefined;
-				}}
-				class="btn btn-warning btn-soft">
-				reset
-			</button>
-			<button
-				onclick={() => {
-					excludedModsTemp = ModsList.reduce((partialSum, a) => partialSum + a, 0);
-				}}
-				class="btn btn-accent btn-soft">
-				exclude all
-			</button>
+			</li>
+			<li>
+				<button
+					onclick={() => {
+						excludedModsTemp = ModsList.reduce((partialSum, a) => partialSum + a, 0);
+					}}
+					class="btn btn-accent btn-soft">
+					exclude all
+				</button>
+			</li>
 		</ul>
 
 		<h3 class="mb-2 text-lg font-bold">include mods</h3>
-		<ul class="inline-flex flex-row gap-2">
+		<ul class="inline-flex flex-row flex-wrap gap-2">
 			{#each ModsList as mod (mod)}
 				{@const [modVal] = getEnumMods(mod)}
 				{@const included = includedEnumMods.includes(modVal)}
 				{@const updateContent = () => (included ? `remove ${modVal}` : `add ${modVal}`)}
+				<li>
+					<button
+						onclick={() => {
+							if (included)
+								includedModsTemp = getModsEnum(includedEnumMods.filter((item) => item !== modVal));
+							else {
+								includedModsTemp = getModsEnum(
+									[...includedEnumMods, modVal].filter((item) => {
+										if (modVal === 'DT' || modVal === 'NC') return item !== 'HT' && item !== 'DC';
+										else if (modVal === 'HT' || modVal === 'DC')
+											return item !== 'DT' && item !== 'NC';
+										else if (modVal === 'HR') return item !== 'EZ';
+										else if (modVal === 'EZ') return item !== 'HR';
+										else return true;
+									})
+								);
+							}
+							includedEnumMods = getEnumMods(includedModsTemp);
+						}}
+						class="cursor-pointer transition-opacity"
+						class:opacity-20={!included}>
+						<Mod
+							mod={modVal}
+							{@attach tooltip(
+								updateContent(),
+								{
+									appendTo: filterModal
+								},
+								updateContent
+							)} />
+					</button>
+				</li>
+			{/each}
+			<li>
 				<button
 					onclick={() => {
-						if (included)
-							includedModsTemp = getModsEnum(includedEnumMods.filter((item) => item !== modVal));
-						else {
-							includedModsTemp = getModsEnum(
-								[...includedEnumMods, modVal].filter((item) => {
-									if (modVal === 'DT' || modVal === 'NC') return item !== 'HT' && item !== 'DC';
-									else if (modVal === 'HT' || modVal === 'DC')
-										return item !== 'DT' && item !== 'NC';
-									else if (modVal === 'HR') return item !== 'EZ';
-									else if (modVal === 'EZ') return item !== 'HR';
-									else return true;
-								})
-							);
-						}
-						includedEnumMods = getEnumMods(includedModsTemp);
+						includedModsTemp = undefined;
+						includedEnumMods = [];
 					}}
-					class="cursor-pointer transition-opacity"
-					class:opacity-20={!included}>
-					<Mod
-						mod={modVal}
-						{@attach tooltip(
-							updateContent(),
-							{
-								appendTo: filterModal
-							},
-							updateContent
-						)} />
+					class="btn btn-warning btn-soft">
+					reset
 				</button>
-			{/each}
-			<button
-				onclick={() => {
-					includedModsTemp = undefined;
-					includedEnumMods = [];
-				}}
-				class="btn btn-warning btn-soft">
-				reset
-			</button>
+			</li>
 		</ul>
 
 		<div class="modal-action">

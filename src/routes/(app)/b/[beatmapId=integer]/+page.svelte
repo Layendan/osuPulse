@@ -164,11 +164,13 @@
 
 	<div class="bg-base-300 grid grid-cols-1 items-center gap-4 p-4 2xl:grid-cols-2">
 		<span class="inline-flex flex-row justify-center gap-2 2xl:justify-self-end">
-			<span class="inline-flex flex-row gap-1">
-				{#each enumMods as mod (mod)}
-					<Mod {mod} {@attach tooltip(mod)} />
-				{/each}
-			</span>
+			{#if enumMods.length > 0}
+				<span class="inline-flex flex-row gap-1">
+					{#each enumMods as mod (mod)}
+						<Mod {mod} {@attach tooltip(mod)} />
+					{/each}
+				</span>
+			{/if}
 			<button onclick={() => addModModal?.showModal()} class="btn btn-primary btn-soft">
 				edit mods
 			</button>
@@ -179,51 +181,55 @@
 					</form>
 
 					<h3 class="mb-2 text-lg font-bold">edit map mods</h3>
-					<ul class="inline-flex flex-row gap-2">
+					<ul class="inline-flex flex-row flex-wrap gap-2">
 						{#each ModsList as mod (mod)}
 							{@const [modVal] = getEnumMods(mod)}
 							{@const included = enumMods.includes(modVal)}
 							{@const updateContent = () => (included ? `remove ${modVal}` : `add ${modVal}`)}
+							<li>
+								<button
+									onclick={() => {
+										if (included) mods = getModsEnum(enumMods.filter((item) => item !== modVal));
+										else {
+											mods = getModsEnum(
+												[...enumMods, modVal].filter((item) => {
+													if (modVal === 'DT' || modVal === 'NC')
+														return item !== 'HT' && item !== 'DC';
+													else if (modVal === 'HT' || modVal === 'DC')
+														return item !== 'DT' && item !== 'NC';
+													else if (modVal === 'HR') return item !== 'EZ';
+													else if (modVal === 'EZ') return item !== 'HR';
+													else return true;
+												})
+											);
+										}
+										pushState(`/b/${data.beatmap.id}?mods=${mods}`, { ...page.state, mods });
+									}}
+									class="cursor-pointer transition-opacity"
+									class:opacity-20={!included}>
+									<Mod
+										mod={modVal}
+										{@attach tooltip(
+											updateContent(),
+											{
+												appendTo: addModModal
+											},
+											updateContent
+										)} />
+								</button>
+							</li>
+						{/each}
+						<li>
 							<button
 								onclick={() => {
-									if (included) mods = getModsEnum(enumMods.filter((item) => item !== modVal));
-									else {
-										mods = getModsEnum(
-											[...enumMods, modVal].filter((item) => {
-												if (modVal === 'DT' || modVal === 'NC')
-													return item !== 'HT' && item !== 'DC';
-												else if (modVal === 'HT' || modVal === 'DC')
-													return item !== 'DT' && item !== 'NC';
-												else if (modVal === 'HR') return item !== 'EZ';
-												else if (modVal === 'EZ') return item !== 'HR';
-												else return true;
-											})
-										);
-									}
+									mods = 0;
+									enumMods = [];
 									pushState(`/b/${data.beatmap.id}?mods=${mods}`, { ...page.state, mods });
 								}}
-								class="cursor-pointer transition-opacity"
-								class:opacity-20={!included}>
-								<Mod
-									mod={modVal}
-									{@attach tooltip(
-										updateContent(),
-										{
-											appendTo: addModModal
-										},
-										updateContent
-									)} />
+								class="btn btn-warning btn-soft">
+								reset
 							</button>
-						{/each}
-						<button
-							onclick={() => {
-								mods = 0;
-								enumMods = [];
-								pushState(`/b/${data.beatmap.id}?mods=${mods}`, { ...page.state, mods });
-							}}
-							class="btn btn-warning btn-soft">
-							reset
-						</button>
+						</li>
 					</ul>
 				</div>
 				<form method="dialog" class="modal-backdrop">
