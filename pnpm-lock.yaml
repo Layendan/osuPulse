@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@faranglao/sveltekit-security-headers':
-        specifier: ^0.2.2
-        version: 0.2.2(@sveltejs/kit@2.43.5(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.39.6)(vite@7.1.7(jiti@2.6.0)(lightningcss@1.30.1)))(svelte@5.39.6)(vite@7.1.7(jiti@2.6.0)(lightningcss@1.30.1)))(svelte@5.39.6)
       '@fortawesome/free-brands-svg-icons':
         specifier: ^7.0.1
         version: 7.0.1
@@ -368,12 +365,6 @@ packages:
     resolution: {integrity: sha512-Z5kJ+wU3oA7MMIqVR9tyZRtjYPr4OC004Q4Rw7pgOKUOKkJfZ3O24nz3WYfGRpMDNmcOi3TwQOmgm7B7Tpii0w==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@faranglao/sveltekit-security-headers@0.2.2':
-    resolution: {integrity: sha512-lk2Hm92RSvExnjvu8vF3fr1WXrSRvbMk9lB30j9XEQRabngHH+NO/tpyA0a02IijbHU2Jx//Ue0j9Bz5POXPvA==}
-    peerDependencies:
-      '@sveltejs/kit': ^2.0.0
-      svelte: ^4.0.0
-
   '@fortawesome/fontawesome-common-types@7.0.1':
     resolution: {integrity: sha512-0VpNtO5cNe1/HQWMkl4OdncYK/mv9hnBte0Ew0n6DMzmo3Q3WzDFABHm6LeNTipt5zAyhQ6Ugjiu8aLaEjh1gg==}
     engines: {node: '>=6'}
@@ -693,11 +684,6 @@ packages:
   '@rollup/rollup-linux-s390x-gnu@4.52.3':
     resolution: {integrity: sha512-jMdsML2VI5l+V7cKfZx3ak+SLlJ8fKvLJ0Eoa4b9/vCUrzXKgoKxvHqvJ/mkWhFiyp88nCkM5S2v6nIwRtPcgg==}
     cpu: [s390x]
-    os: [linux]
-
-  '@rollup/rollup-linux-x64-gnu@4.12.0':
-    resolution: {integrity: sha512-TenQhZVOtw/3qKOPa7d+QgkeM6xY0LtwzR8OplmyL5LrgTWIXpTQg2Q2ycBf8jm+SFW2Wt/DTn1gf7nFp3ssVA==}
-    cpu: [x64]
     os: [linux]
 
   '@rollup/rollup-linux-x64-gnu@4.52.3':
@@ -2258,13 +2244,6 @@ snapshots:
       '@eslint/core': 0.15.2
       levn: 0.4.1
 
-  '@faranglao/sveltekit-security-headers@0.2.2(@sveltejs/kit@2.43.5(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.39.6)(vite@7.1.7(jiti@2.6.0)(lightningcss@1.30.1)))(svelte@5.39.6)(vite@7.1.7(jiti@2.6.0)(lightningcss@1.30.1)))(svelte@5.39.6)':
-    dependencies:
-      '@sveltejs/kit': 2.43.5(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.39.6)(vite@7.1.7(jiti@2.6.0)(lightningcss@1.30.1)))(svelte@5.39.6)(vite@7.1.7(jiti@2.6.0)(lightningcss@1.30.1))
-      svelte: 5.39.6
-    optionalDependencies:
-      '@rollup/rollup-linux-x64-gnu': 4.12.0
-
   '@fortawesome/fontawesome-common-types@7.0.1': {}
 
   '@fortawesome/free-brands-svg-icons@7.0.1':
@@ -2503,9 +2482,6 @@ snapshots:
     optional: true
 
   '@rollup/rollup-linux-s390x-gnu@4.52.3':
-    optional: true
-
-  '@rollup/rollup-linux-x64-gnu@4.12.0':
     optional: true
 
   '@rollup/rollup-linux-x64-gnu@4.52.3':

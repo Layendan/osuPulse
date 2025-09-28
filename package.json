@@ -51,7 +51,6 @@
 		]
 	},
 	"dependencies": {
-		"@faranglao/sveltekit-security-headers": "^0.2.2",
 		"@fortawesome/free-brands-svg-icons": "^7.0.1",
 		"@fortawesome/free-solid-svg-icons": "^7.0.1",
 		"osu-web.js": "^2.6.0",
