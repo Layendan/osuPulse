@@ -132,7 +132,7 @@
 			{/each}
 			<button
 				onclick={() => {
-					includedMods = undefined;
+					includedModsTemp = undefined;
 					includedEnumMods = [];
 				}}
 				class="btn btn-warning btn-soft">
