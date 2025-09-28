@@ -102,9 +102,9 @@
 				<button
 					onclick={() => {
 						if (included)
-							includedMods = getModsEnum(includedEnumMods.filter((item) => item !== modVal));
+							includedModsTemp = getModsEnum(includedEnumMods.filter((item) => item !== modVal));
 						else {
-							includedMods = getModsEnum(
+							includedModsTemp = getModsEnum(
 								[...includedEnumMods, modVal].filter((item) => {
 									if (modVal === 'DT' || modVal === 'NC') return item !== 'HT' && item !== 'DC';
 									else if (modVal === 'HT' || modVal === 'DC')
@@ -115,7 +115,7 @@
 								})
 							);
 						}
-						includedEnumMods = getEnumMods(includedMods);
+						includedEnumMods = getEnumMods(includedModsTemp);
 					}}
 					class="cursor-pointer transition-opacity"
 					class:opacity-20={!included}>
