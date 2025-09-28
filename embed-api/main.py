@@ -80,14 +80,18 @@ class BeatmapQuery(BaseModel):
     beatmap_id: int
     mods: int
     top_n: int = 10
+    exclude_mods_filter: int | None = None
+    include_mods_filter: int | None = None
 
 
 class UserRequest(BaseModel):
     user_id: int
     top_n_neighbors: int = 50
+    exclude_mods_filter: int | None = None
+    include_mods_filter: int | None = None
 
 
-search_params = {"metric_type": "L2", "params": {"ef": 64}}
+search_params = {"metric_type": "L2", "params": {"ef": 64}, "hints": "iterative_filter"}
 
 
 @asynccontextmanager
@@ -327,8 +331,52 @@ async def process_new_ranked_maps(client: MilvusClient, aiosu_client: aiosu.v2.C
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
+def build_filter_expression(
+    include_mods_filter: int | None, exclude_mods_filter: int | None
+):
+    include_exprs = []
+    exclude_exprs = []
+
+    # For inclusion, find all dictionary keys whose bits match the include_mods_filter pattern
+    if include_mods_filter is not None:
+        for _, val in MOD_PRESETS_SKILLS.items():
+            # Include if all bits in include_mods_filter are set in val
+            if (val & include_mods_filter) == include_mods_filter:
+                include_exprs.append(f"(Mods == {val})")
+        # Combine with OR
+        include_expr = "(" + " or ".join(include_exprs) + ")" if include_exprs else ""
+
+    else:
+        include_expr = ""
+
+    # For exclusion, exclude any Mods equal to bitmasks that contain any excluded bits
+    if exclude_mods_filter is not None:
+        for _, val in MOD_PRESETS_SKILLS.items():
+            # Exclude if any bit in exclude_mods_filter is present in val
+            if (val & exclude_mods_filter) != 0:
+                exclude_exprs.append(f"(Mods != {val})")
+        # Combine with AND
+        exclude_expr = "(" + " and ".join(exclude_exprs) + ")" if exclude_exprs else ""
+
+    else:
+        exclude_expr = ""
+
+    # Combine include and exclude expressions with AND if both present
+    if include_expr and exclude_expr:
+        expr = f"({include_expr} and {exclude_expr})"
+    else:
+        expr = include_expr or exclude_expr or ""
+
+    return expr
+
+
 def find_similar_beatmaps_by_id(
-    client: MilvusClient, beatmap_id: int, mod: int, top_n=10
+    client: MilvusClient,
+    beatmap_id: int,
+    mod: int,
+    top_n=10,
+    exclude_mods_filter: int | None = None,
+    include_mods_filter: int | None = None,
 ):
     expr = f"(BeatmapID == {beatmap_id}) and (Mods == {mod})"
     res = client.query(
@@ -345,11 +393,13 @@ def find_similar_beatmaps_by_id(
     query_vector = query_record["embedding"]
     query_skill_vector = [query_record[skill] for skill in SKILL_COLUMNS]
     query_skill_sum = sum(query_skill_vector)
+    expr = build_filter_expression(include_mods_filter, exclude_mods_filter)
     search_results = client.search(
         collection_name=COLLECTION_NAME,
         data=[query_vector],
+        filter=expr,
         anns_field="embedding",
-        params=search_params,
+        search_params=search_params,
         limit=top_n + 1,
         output_fields=["BeatmapID", "BeatmapsetID", "Mods", "Title", "Version"]
         + SKILL_COLUMNS,
@@ -379,7 +429,7 @@ def find_similar_beatmaps_by_id(
     return rows, query_skill_sum
 
 
-async def get_user_top_scores(client: aiosu.v2.Client, user_id: int, n_scores=100):
+async def get_user_top_scores(client: aiosu.v2.Client, user_id: int, n_scores=50):
     best_scores = await client.get_user_bests(
         user_id=user_id,
         mode=aiosu.models.gamemode.Gamemode.STANDARD,
@@ -442,7 +492,13 @@ async def get_user_recent_scores(
     return result
 
 
-def tally_neighbors(client: MilvusClient, user_scores: list, top_n_neighbors=50):
+def tally_neighbors(
+    client: MilvusClient,
+    user_scores: list,
+    top_n_neighbors=50,
+    exclude_mods_filter: int | None = None,
+    include_mods_filter: int | None = None,
+):
     neighbor_info = defaultdict(
         lambda: {
             "distances": [],
@@ -463,7 +519,12 @@ def tally_neighbors(client: MilvusClient, user_scores: list, top_n_neighbors=50)
         user_weight = 1 - (idx / 100)
         user_accuracy = score.get("accuracy", 0)
         neighbor_rows, skill_value = find_similar_beatmaps_by_id(
-            client, beatmap_id, mod, top_n=10
+            client,
+            beatmap_id,
+            mod,
+            top_n=10,
+            exclude_mods_filter=exclude_mods_filter,
+            include_mods_filter=include_mods_filter,
         )
         if neighbor_rows is None or skill_value is None:
             continue
@@ -523,9 +584,20 @@ async def health():
 
 
 @app.get("/similar_beatmaps/")
-async def api_similar_beatmaps(beatmap_id: int, mods: int, top_n: int = 10):
+async def api_similar_beatmaps(
+    beatmap_id: int,
+    mods: int,
+    top_n: int = 10,
+    exclude_mods_filter: int | None = None,
+    include_mods_filter: int | None = None,
+):
     rows, skill_sum = find_similar_beatmaps_by_id(
-        app.state.milvus_client, beatmap_id, mods, top_n
+        app.state.milvus_client,
+        beatmap_id,
+        mods,
+        top_n,
+        exclude_mods_filter,
+        include_mods_filter,
     )
     if rows is None:
         raise HTTPException(status_code=404, detail="No beatmap found")
@@ -540,6 +612,8 @@ async def api_user_top_neighbors(req: UserRequest):
             app.state.milvus_client,
             user_scores,
             req.top_n_neighbors,
+            req.exclude_mods_filter,
+            req.include_mods_filter,
         )
         return {"user_id": req.user_id, "top_neighbors": summary}
     except Exception as e:
@@ -554,6 +628,8 @@ async def api_user_recent_neighbors(req: UserRequest):
             app.state.milvus_client,
             user_scores,
             req.top_n_neighbors,
+            req.exclude_mods_filter,
+            req.include_mods_filter,
         )
         return {"user_id": req.user_id, "top_neighbors": summary}
     except Exception as e:

@@ -5,6 +5,7 @@
 
 	import Beatmap from '$lib/components/Beatmap.svelte';
 	import BeatmapSearch from '$lib/components/BeatmapSearch.svelte';
+	import FilterButton from '$lib/components/FilterButton.svelte';
 	import RefetchButton from '$lib/components/RefetchButton.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import UserSearch from '$lib/components/UserSearch.svelte';
@@ -20,6 +21,17 @@
 
 	let globalRank = $derived(data.user.statistics.global_rank);
 	let countryRank = $derived(data.user.statistics.country_rank);
+
+	let excludedMods: number | undefined = $state(undefined);
+	let includedMods: number | undefined = $state(undefined);
+
+	let query = $derived(
+		getUserPulseNeighbors({
+			userId: data.user.id,
+			excludedMods,
+			includedMods
+		})
+	);
 
 	function tooltip(content: string, props?: Partial<Props>): Attachment {
 		return (element) => {
@@ -117,7 +129,7 @@
 					{data.user.username}'s profile
 				</a>
 				<ShareButton />
-				<RefetchButton queryFunction={getUserPulseNeighbors(data.user.id)} />
+				<RefetchButton queryFunction={query} />
 			</div>
 		</div>
 		<div class="flex flex-row flex-wrap gap-2 max-2xl:justify-center">
@@ -126,9 +138,13 @@
 		</div>
 	</div>
 
+	<div class="bg-base-300 grid place-items-center p-4">
+		<FilterButton bind:excludedMods bind:includedMods />
+	</div>
+
 	<div class="grid min-h-[60svh] place-items-center py-4">
 		<svelte:boundary>
-			{@const { top_neighbors } = await getUserPulseNeighbors(data.user.id)}
+			{@const { top_neighbors } = await query}
 
 			<ul class="grid w-full grid-cols-1 gap-4 px-4 lg:grid-cols-2">
 				{#each top_neighbors as neighbor, i (`${neighbor.BeatmapID}-${neighbor.Mods}`)}

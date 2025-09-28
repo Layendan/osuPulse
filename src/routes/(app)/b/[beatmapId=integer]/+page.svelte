@@ -6,6 +6,7 @@
 	import { ModsList } from '$lib';
 	import Beatmap from '$lib/components/Beatmap.svelte';
 	import BeatmapSearch from '$lib/components/BeatmapSearch.svelte';
+	import FilterButton from '$lib/components/FilterButton.svelte';
 	import Mod from '$lib/components/Mod.svelte';
 	import RefetchButton from '$lib/components/RefetchButton.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
@@ -31,6 +32,18 @@
 	});
 
 	let addModModal: HTMLDialogElement | undefined = $state(undefined);
+
+	let excludedMods: number | undefined = $state(undefined);
+	let includedMods: number | undefined = $state(undefined);
+
+	let query = $derived(
+		getBeatmapNeighbors({
+			beatmapId: data.beatmap.id,
+			mods,
+			excludedMods,
+			includedMods
+		})
+	);
 
 	function tooltip(
 		content: string,
@@ -140,11 +153,7 @@
 					download beatmap
 				</a>
 				<ShareButton {url} />
-				<RefetchButton
-					queryFunction={getBeatmapNeighbors({
-						beatmapId: data.beatmap.id,
-						mods
-					})} />
+				<RefetchButton queryFunction={query} />
 			</div>
 		</div>
 		<div class="flex flex-row flex-wrap gap-2 max-2xl:justify-center">
@@ -153,21 +162,23 @@
 		</div>
 	</div>
 
-	<div class="bg-base-300 grid place-items-center p-4">
-		<span class="inline-flex flex-row gap-1">
-			{#each enumMods as mod (mod)}
-				<Mod {mod} {@attach tooltip(mod)} />
-			{/each}
-			<button onclick={() => addModModal?.showModal()} class="btn btn-primary btn-soft ml-3">
+	<div class="bg-base-300 grid grid-cols-1 items-center gap-4 p-4 2xl:grid-cols-2">
+		<span class="inline-flex flex-row justify-center gap-2 2xl:justify-self-end">
+			<span class="inline-flex flex-row gap-1">
+				{#each enumMods as mod (mod)}
+					<Mod {mod} {@attach tooltip(mod)} />
+				{/each}
+			</span>
+			<button onclick={() => addModModal?.showModal()} class="btn btn-primary btn-soft">
 				edit mods
 			</button>
-			<dialog id="add_mod_modal" class="modal modal-bottom" bind:this={addModModal}>
+			<dialog id="add_mod_modal" class="modal" bind:this={addModModal}>
 				<div class="modal-box">
 					<form method="dialog">
 						<button class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2">✕</button>
 					</form>
 
-					<h3 class="mb-2 text-lg font-bold">edit mods</h3>
+					<h3 class="mb-2 text-lg font-bold">edit map mods</h3>
 					<ul class="inline-flex flex-row gap-2">
 						{#each ModsList as mod (mod)}
 							{@const [modVal] = getEnumMods(mod)}
@@ -204,6 +215,15 @@
 									)} />
 							</button>
 						{/each}
+						<button
+							onclick={() => {
+								mods = 0;
+								enumMods = [];
+								pushState(`/b/${data.beatmap.id}?mods=${mods}`, { ...page.state, mods });
+							}}
+							class="btn btn-warning btn-soft">
+							reset
+						</button>
 					</ul>
 				</div>
 				<form method="dialog" class="modal-backdrop">
@@ -211,14 +231,15 @@
 				</form>
 			</dialog>
 		</span>
+
+		<span class="flex flex-row max-2xl:justify-center">
+			<FilterButton bind:excludedMods bind:includedMods />
+		</span>
 	</div>
 
 	<div class="grid min-h-[60svh] place-items-center py-4">
 		<svelte:boundary>
-			{@const { neighbors } = await getBeatmapNeighbors({
-				beatmapId: data.beatmap.id,
-				mods
-			})}
+			{@const { neighbors } = await query}
 
 			<ul class="grid w-full grid-cols-1 gap-4 px-4 lg:grid-cols-2">
 				{#each neighbors as neighbor, i (`${neighbor.BeatmapID}-${neighbor.Mods}`)}
