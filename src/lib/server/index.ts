@@ -11,12 +11,17 @@ async function refreshToken() {
 		const token = await auth.clientCredentialsGrant();
 		client.setAccessToken(token.access_token);
 
-		setTimeout(() => refreshToken(), token.expires_in - 10);
+		setTimeout(() => refreshToken(), token.expires_in);
 	} catch (e) {
 		console.error('Error refreshing token', e);
-		if (isOsuJSError(e)) console.error(`Message: ${e.message}`, `Cause: ${e.cause}`);
-		refreshToken();
+		if (isOsuJSError(e))
+			console.error(
+				`Message: ${e.message}`,
+				`Cause: ${e.cause}`,
+				`Type: ${e.type}`,
+				`Name: ${e.name}`
+			);
 	}
 }
 
-setTimeout(() => refreshToken(), token.expires_in - 10);
+setTimeout(() => refreshToken(), token.expires_in);
