@@ -1,15 +1,16 @@
+import type { Beatmap } from 'osu-api-v2-js';
 import type { PageServerLoad } from './$types';
 
-import { client } from '$lib/server';
+import { api } from '$lib/server';
 import { error } from '@sveltejs/kit';
 
 export const load = (async ({ params, url }) => {
 	const beatmapId = parseInt(params.beatmapId);
 
-	let beatmap: Awaited<ReturnType<typeof client.beatmaps.getBeatmap>>;
+	let beatmap: Beatmap.Extended.WithFailtimesOwnersMaxcomboBeatmapset;
 
 	try {
-		beatmap = await client.beatmaps.getBeatmap(beatmapId);
+		beatmap = await api.getBeatmap(beatmapId);
 	} catch (e) {
 		console.error(e);
 		error(404, 'Beatmap not found');

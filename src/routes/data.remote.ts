@@ -1,9 +1,9 @@
-import type { UserExtended } from 'osu-web.js';
+import type { User } from 'osu-api-v2-js';
 
-import { client } from '$lib/server';
+import { api } from '$lib/server';
 import { error, redirect } from '@sveltejs/kit';
 import { form } from '$app/server';
-import { isOsuJSError } from 'osu-web.js';
+import { Ruleset } from 'osu-api-v2-js';
 import { nonEmpty, object, pipe, string, url } from 'valibot';
 
 export const navigateToBeatmap = form(
@@ -44,37 +44,11 @@ export const navigateToBeatmap = form(
 export const navigateToUser = form(
 	object({ user: pipe(string(), nonEmpty()) }),
 	async ({ user }) => {
-		let userData: UserExtended;
+		let userData: User.Extended;
 		try {
-			userData = await client.users.getUser(user);
+			userData = await api.getUser(user, Ruleset.osu);
 		} catch (e) {
 			console.error(e);
-			if (isOsuJSError(e)) {
-				console.error(`Message: ${e.message}`, `Cause: ${e.cause}`);
-				switch (e.type) {
-					case 'invalid_json_syntax':
-						error(400, 'Invalid JSON syntax');
-						break;
-					case 'network_error':
-						error(500, 'Network error');
-						break;
-					case 'unexpected_response': {
-						const response = e.response();
-
-						if (response.status === 404) {
-							error(404, 'User not found');
-						}
-
-						const text = await response.text();
-						console.error(response.status, text);
-						error(response.status, text);
-						break;
-					}
-					default:
-						error(500, 'Something went wrong');
-						break;
-				}
-			}
 			error(500, 'Something went wrong');
 		}
 
@@ -87,35 +61,9 @@ export const navigateToUserPulse = form(
 	async ({ user }) => {
 		let userData;
 		try {
-			userData = await client.users.getUser(user);
+			userData = await api.getUser(user, Ruleset.osu);
 		} catch (e) {
 			console.error(e);
-			if (isOsuJSError(e)) {
-				console.error(`Message: ${e.message}`, `Cause: ${e.cause}`);
-				switch (e.type) {
-					case 'invalid_json_syntax':
-						error(400, 'Invalid JSON syntax');
-						break;
-					case 'network_error':
-						error(500, 'Network error');
-						break;
-					case 'unexpected_response': {
-						const response = e.response();
-
-						if (response.status === 404) {
-							error(404, 'User not found');
-						}
-
-						const text = await response.text();
-						console.error(response.status, text);
-						error(response.status, text);
-						break;
-					}
-					default:
-						error(500, 'Something went wrong');
-						break;
-				}
-			}
 			error(500, 'Something went wrong');
 		}
 

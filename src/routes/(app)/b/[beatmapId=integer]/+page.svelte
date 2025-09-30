@@ -36,7 +36,7 @@
 	let excludedMods: number | undefined = $state(undefined);
 	let includedMods: number | undefined = $state(undefined);
 
-	let query = $derived(
+	const query = $derived(
 		getBeatmapNeighbors({
 			beatmapId: data.beatmap.id,
 			mods,

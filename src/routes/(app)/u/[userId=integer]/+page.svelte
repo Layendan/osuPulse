@@ -25,7 +25,7 @@
 	let excludedMods: number | undefined = $state(undefined);
 	let includedMods: number | undefined = $state(undefined);
 
-	let query = $derived(
+	const query = $derived(
 		getUserNeighbors({
 			userId: data.user.id,
 			excludedMods,

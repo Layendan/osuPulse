@@ -1,19 +1,17 @@
+import type { User } from 'osu-api-v2-js';
 import type { PageServerLoad } from './$types';
 
-import { client } from '$lib/server';
+import { api } from '$lib/server';
 import { error } from '@sveltejs/kit';
+import { Ruleset } from 'osu-api-v2-js';
 
 export const load = (async ({ params }) => {
 	const userId = parseInt(params.userId);
 
-	let user: Awaited<ReturnType<typeof client.users.getUser>>;
+	let user: User.Extended;
 
 	try {
-		user = await client.users.getUser(userId, {
-			urlParams: {
-				mode: 'osu'
-			}
-		});
+		user = await api.getUser(userId, Ruleset.osu);
 	} catch (e) {
 		console.error(e);
 		error(404, 'User not found');
