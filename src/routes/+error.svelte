@@ -16,12 +16,12 @@
 	<meta property="og:url" content="https://pulse.layendan.dev" />
 	<meta property="og:site_name" content="osu!Pulse" />
 	<meta property="og:locale" content="en_US" />
-	<meta property="og:image" content="/logo.png" />
+	<meta property="og:image" content="/favicon.png" />
 	<meta property="og:image:alt" content="osu!Pulse Logo" />
 	<meta property="og:image:type" content="image/png" />
 	<meta property="og:image:width" content="506" />
-	<meta property="og:image:height" content="505" />
-	<meta property="og:image:secure_url" content="https://pulse.layendan.dev/logo.png" />
+	<meta property="og:image:height" content="506" />
+	<meta property="og:image:secure_url" content="https://pulse.layendan.dev/favicon.png" />
 </svelte:head>
 
 <div class="flex h-full min-h-screen w-full flex-col items-center justify-center gap-4">

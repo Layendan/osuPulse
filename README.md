@@ -1,5 +1,5 @@
 <p align="center">
-    <img width="250" alt="osu!Pulse logo" src="static/logo.png"/>
+    <img width="250" alt="osu!Pulse logo" src="static/favicon.png"/>
 </p>
 
 # osu!Pulse

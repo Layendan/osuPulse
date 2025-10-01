@@ -19,8 +19,9 @@
 
 	let { data }: PageProps = $props();
 
-	let globalRank = $derived(data.user.statistics.global_rank);
-	let countryRank = $derived(data.user.statistics.country_rank);
+	const globalRank = $derived(data.user.statistics.global_rank);
+	const countryRank = $derived(data.user.statistics.country_rank);
+	const pp = $derived(data.user.statistics.pp);
 
 	let excludedMods: number | undefined = $state(undefined);
 	let includedMods: number | undefined = $state(undefined);
@@ -44,13 +45,19 @@
 
 <svelte:head>
 	<title>osu!Pulse - {data.user.username}'s pulse</title>
-	<meta name="description" content="Find similar beatmaps for {data.user.username}." />
+	<meta
+		name="description"
+		content="Explore your osu!Pulse profile to view tailored beatmap recommendations powered by your own gameplay stats. Uncover new osu! maps custom-matched to your unique style and skills for the ultimate personalized experience." />
 	<meta name="twitter:card" content="summary" />
 	<meta name="twitter:title" content="osu!Pulse - {data.user.username}'s pulse" />
-	<meta name="twitter:description" content="Find similar beatmaps for {data.user.username}." />
+	<meta
+		name="twitter:description"
+		content="Explore your osu!Pulse profile to view tailored beatmap recommendations powered by your own gameplay stats. Uncover new osu! maps custom-matched to your unique style and skills for the ultimate personalized experience." />
 	<meta property="og:type" content="website" />
 	<meta property="og:title" content="osu!Pulse - {data.user.username}'s pulse" />
-	<meta property="og:description" content="Find similar beatmaps for {data.user.username}." />
+	<meta
+		property="og:description"
+		content="Explore your osu!Pulse profile to view tailored beatmap recommendations powered by your own gameplay stats. Uncover new osu! maps custom-matched to your unique style and skills for the ultimate personalized experience." />
 	<meta property="og:url" content="https://pulse.layendan.dev" />
 	<meta property="og:site_name" content="osu!Pulse" />
 	<meta property="og:locale" content="en_US" />
@@ -97,7 +104,7 @@
 					</h2>
 					<h2 class="text-3xl font-light max-sm:hidden">
 						<legend class="text-xs">Performance Points</legend>
-						{new Intl.NumberFormat().format(parseInt(data.user.statistics.pp.toFixed(0)))}pp
+						{new Intl.NumberFormat().format(parseInt((pp ?? 0).toFixed(0)))}pp
 					</h2>
 				</span>
 			</div>

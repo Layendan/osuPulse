@@ -65,21 +65,26 @@
 
 <svelte:head>
 	<title>osu!Pulse - Recommended maps for {data.beatmap.beatmapset.title}</title>
-	<meta name="description" content="Find similar beatmaps for {data.beatmap.beatmapset.title}." />
+	<meta
+		name="description"
+		content="Get detailed data for {data.beatmap.beatmapset
+			.title} with osu!Pulse. View key stats, difficulty levels, and performance insights while exploring personalized recommendations for similar maps to enhance your osu! gameplay experience." />
 	<meta name="twitter:card" content="summary" />
 	<meta
 		name="twitter:title"
 		content="osu!Pulse - Recommended maps for {data.beatmap.beatmapset.title}" />
 	<meta
 		name="twitter:description"
-		content="Find similar beatmaps for {data.beatmap.beatmapset.title}." />
+		content="Get detailed data for {data.beatmap.beatmapset
+			.title} with osu!Pulse. View key stats, difficulty levels, and performance insights while exploring personalized recommendations for similar maps to enhance your osu! gameplay experience." />
 	<meta property="og:type" content="website" />
 	<meta
 		property="og:title"
 		content="osu!Pulse - Recommended maps for {data.beatmap.beatmapset.title}" />
 	<meta
 		property="og:description"
-		content="Find similar beatmaps for {data.beatmap.beatmapset.title}." />
+		content="Get detailed data for {data.beatmap.beatmapset
+			.title} with osu!Pulse. View key stats, difficulty levels, and performance insights while exploring personalized recommendations for similar maps to enhance your osu! gameplay experience." />
 	<meta property="og:url" content="https://pulse.layendan.dev" />
 	<meta property="og:site_name" content="osu!Pulse" />
 	<meta property="og:locale" content="en_US" />
