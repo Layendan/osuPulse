@@ -21,20 +21,20 @@
 </script>
 
 <svelte:head>
-	<title>osuPulse - AI-Powered osu! Map Recommendations</title>
+	<title>osu!Pulse - AI-Powered osu! Map Recommendations</title>
 	<meta
 		name="description"
-		content="Discover new osu! beatmaps tailored to your preferences with osuPulse. Using advanced similarity search and user gameplay data, osuPulse makes finding fresh maps you'll love fast and effortless for every osu! player." />
+		content="Discover new osu! beatmaps tailored to your preferences with osu!Pulse. Using similarity search and user data, osu!Pulse makes finding fresh maps you'll love fast and effortless." />
 	<meta name="twitter:card" content="summary" />
-	<meta name="twitter:title" content="osuPulse - AI-Powered osu! Map Recommendations" />
+	<meta name="twitter:title" content="osu!Pulse - AI-Powered osu! Map Recommendations" />
 	<meta
 		name="twitter:description"
-		content="Discover new osu! beatmaps tailored to your preferences with osuPulse. Using advanced similarity search and user gameplay data, osuPulse makes finding fresh maps you'll love fast and effortless for every osu! player." />
+		content="Discover new osu! beatmaps tailored to your preferences with osu!Pulse. Using similarity search and user data, osu!Pulse makes finding fresh maps you'll love fast and effortless." />
 	<meta property="og:type" content="website" />
-	<meta property="og:title" content="osuPulse - AI-Powered osu! Map Recommendations" />
+	<meta property="og:title" content="osu!Pulse - AI-Powered osu! Map Recommendations" />
 	<meta
 		property="og:description"
-		content="Discover new osu! beatmaps tailored to your preferences with osuPulse. Using advanced similarity search and user gameplay data, osuPulse makes finding fresh maps you'll love fast and effortless for every osu! player." />
+		content="Discover new osu! beatmaps tailored to your preferences with osu!Pulse. Using similarity search and user data, osu!Pulse makes finding fresh maps you'll love fast and effortless." />
 	<meta property="og:url" content="https://pulse.layendan.dev" />
 	<meta property="og:site_name" content="osu!Pulse" />
 	<meta property="og:locale" content="en_US" />
@@ -104,7 +104,7 @@
 					<Fa icon={faDiscord} />
 				</a>
 				<a
-					href="https://github.com/Layendan/OsuPulse"
+					href="https://github.com/Layendan/Osu!Pulse"
 					target="_blank"
 					rel="noopener noreferrer"
 					class="text-2xl"
