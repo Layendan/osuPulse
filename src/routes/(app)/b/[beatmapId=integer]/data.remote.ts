@@ -24,7 +24,7 @@ export const getBeatmapNeighbors = query(
 		url.searchParams.set('mods', mods.toString());
 		url.searchParams.set('top_n', '50');
 		if (excludedMods) url.searchParams.set('exclude_mods_filter', excludedMods.toString());
-		if (includedMods) url.searchParams.set('exclude_mods_filter', includedMods.toString());
+		if (includedMods) url.searchParams.set('include_mods_filter', includedMods.toString());
 
 		const response = await fetch(url, {
 			headers: {
