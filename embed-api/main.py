@@ -436,7 +436,6 @@ async def get_user_top_scores(client: aiosu.v2.Client, user_id: int, n_scores=50
         limit=n_scores,
         new_format=True,
     )
-    # print(best_scores[:5])
     result = []
     for score in best_scores:
         beatmap = score.beatmap
@@ -444,6 +443,7 @@ async def get_user_top_scores(client: aiosu.v2.Client, user_id: int, n_scores=50
         result.append(
             {
                 "beatmap": {"id": beatmap.id if beatmap else None},
+                "beatmapset": {"id": beatmap.beatmapset_id if beatmap else None},
                 "mods": mods_short,
                 "accuracy": score.accuracy,
             }
@@ -471,8 +471,9 @@ async def get_user_recent_scores(
             and score.pp is not None
         ):
             beatmap_id = score.beatmap.id if score.beatmap else None
+            beatmapset_id = score.beatmap.beatmapset_id if score.beatmap else None
             mods = tuple(sorted([m.acronym.lower() for m in (score.mods or [])]))
-            key = (beatmap_id, mods)
+            key = (beatmap_id, beatmapset_id, mods)
             accuracy_bucket[key].append(score.accuracy)
             if key not in seen:
                 seen[key] = (beatmap_id, mods)
@@ -480,11 +481,12 @@ async def get_user_recent_scores(
 
     result = []
     for key in key_order:
-        beatmap_id, mods = key
+        beatmap_id, beatmapset_id, mods = key
         avg_accuracy = sum(accuracy_bucket[key]) / len(accuracy_bucket[key])
         result.append(
             {
                 "beatmap": {"id": beatmap_id},
+                "beatmapset": {"id": beatmapset_id},
                 "mods": list(mods),
                 "accuracy": avg_accuracy,
             }
@@ -502,6 +504,7 @@ def tally_neighbors(
     neighbor_info = defaultdict(
         lambda: {
             "distances": [],
+            "neighbors": [],
             "weights": [],
             "accuracies": [],
             "title": None,
@@ -531,6 +534,14 @@ def tally_neighbors(
         for row in neighbor_rows:
             key = (row["BeatmapID"], row["BeatmapsetID"], row["Mods"])
             neighbor_info[key]["distances"].append(row["Distance"])
+            neighbor_info[key]["neighbors"].append(
+                {
+                    "beatmap_id": beatmap_id,
+                    "beatmapset_id": score["beatmapset"]["id"],
+                    "mods": mod,
+                    "distance": row["Distance"],
+                }
+            )
             neighbor_info[key]["weights"].append(user_weight)
             neighbor_info[key]["accuracies"].append(
                 np.clip(user_accuracy * row["AccMult"], 0, 1)
@@ -559,6 +570,7 @@ def tally_neighbors(
                 "AvgAccuracy": avg_accuracy,
                 "Title": val["title"],
                 "Version": val["version"],
+                "Neighbors": val["neighbors"],
             }
         )
     if not summary:

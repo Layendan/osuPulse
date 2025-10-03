@@ -40,7 +40,10 @@
 	}
 </script>
 
-<button onclick={() => filterModal?.showModal()} class="btn btn-primary btn-soft">
+<button
+	onclick={() => filterModal?.showModal()}
+	class="btn btn-primary btn-soft"
+	{@attach tooltip('filtering options', { placement: 'bottom' })}>
 	<Fa icon={faFilter} />
 	filter
 </button>

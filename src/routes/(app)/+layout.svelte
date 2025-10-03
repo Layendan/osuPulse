@@ -4,6 +4,7 @@
 
 	import icon from '$lib/assets/icon.png?enhanced';
 	import { faDiscord, faGithub } from '@fortawesome/free-brands-svg-icons';
+	import { resolve } from '$app/paths';
 	import Fa from 'svelte-fa';
 	import tippy from 'tippy.js';
 
@@ -20,7 +21,7 @@
 
 <nav class="navbar bg-base-200 mb-4 shadow-sm">
 	<div class="container mx-auto inline-flex text-center">
-		<a href="/" class="group inline-flex text-2xl font-bold">
+		<a href={resolve('/')} class="group inline-flex text-2xl font-bold">
 			<enhanced:img
 				src={icon}
 				alt="icon"

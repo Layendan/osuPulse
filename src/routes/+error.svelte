@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import Fa from 'svelte-fa';
 </script>
@@ -32,5 +33,5 @@
 	<h2 class="text-center text-2xl">
 		{page.error?.message}
 	</h2>
-	<a href="/" class="btn btn-soft btn-primary">return home</a>
+	<a href={resolve('/')} class="btn btn-soft btn-primary">return home</a>
 </div>

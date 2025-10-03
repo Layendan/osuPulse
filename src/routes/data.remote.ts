@@ -9,7 +9,7 @@ import { nonEmpty, object, pipe, string, url } from 'valibot';
 export const navigateToBeatmap = form(
 	object({ beatmap: pipe(string(), url(), nonEmpty()) }),
 	({ beatmap }) => {
-		const parsedUrl = new URL(beatmap);
+		const parsedUrl = new URL(beatmap.trim());
 
 		if (parsedUrl.hostname !== 'osu.ppy.sh') {
 			error(400, 'Invalid URL');
@@ -46,7 +46,7 @@ export const navigateToUser = form(
 	async ({ user }) => {
 		let userData: User.Extended;
 		try {
-			userData = await api.getUser(user, Ruleset.osu);
+			userData = await api.getUser(user.trim(), Ruleset.osu);
 		} catch (e) {
 			console.error(e);
 			error(500, 'Something went wrong');
@@ -61,7 +61,7 @@ export const navigateToUserPulse = form(
 	async ({ user }) => {
 		let userData;
 		try {
-			userData = await api.getUser(user, Ruleset.osu);
+			userData = await api.getUser(user.trim(), Ruleset.osu);
 		} catch (e) {
 			console.error(e);
 			error(500, 'Something went wrong');

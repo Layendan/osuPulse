@@ -4,6 +4,7 @@
 	import type { PageProps } from './$types';
 
 	import Beatmap from '$lib/components/Beatmap.svelte';
+	import BeatmapDetailToggle from '$lib/components/BeatmapDetailToggle.svelte';
 	import BeatmapSearch from '$lib/components/BeatmapSearch.svelte';
 	import FilterButton from '$lib/components/FilterButton.svelte';
 	import RefetchButton from '$lib/components/RefetchButton.svelte';
@@ -25,6 +26,8 @@
 
 	let excludedMods: number | undefined = $state(undefined);
 	let includedMods: number | undefined = $state(undefined);
+
+	let isDetailed: boolean = $state(false);
 
 	const query = $derived(
 		getUserNeighbors({
@@ -139,16 +142,14 @@
 				</a>
 				<ShareButton />
 				<RefetchButton queryFunction={query} />
+				<FilterButton bind:excludedMods bind:includedMods />
+				<BeatmapDetailToggle bind:isDetailed />
 			</div>
 		</div>
 		<div class="flex flex-row flex-wrap gap-2 max-2xl:justify-center">
 			<BeatmapSearch />
 			<UserSearch />
 		</div>
-	</div>
-
-	<div class="bg-base-300 grid place-items-center p-4">
-		<FilterButton bind:excludedMods bind:includedMods />
 	</div>
 
 	<div class="grid min-h-[60svh] place-items-center py-4">
@@ -158,7 +159,7 @@
 			<ul class="grid w-full grid-cols-1 gap-4 px-4 lg:grid-cols-2">
 				{#each top_neighbors as neighbor, i (`${neighbor.BeatmapID}-${neighbor.Mods}`)}
 					<li transition:fade={{ duration: 500 }} animate:flip={{ duration: 500 }}>
-						<Beatmap {neighbor} rank={i + 1} />
+						<Beatmap {neighbor} rank={i + 1} {isDetailed} />
 					</li>
 				{:else}
 					<h2 class="col-span-2 text-center">no beatmaps found <br /> play some beatmaps first</h2>

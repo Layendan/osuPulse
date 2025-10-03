@@ -4,6 +4,15 @@ import { ModsEnum } from 'osu-web.js';
 
 export type FormError = { status: number; body: { message: string } };
 
+export type NeighborInfo = {
+	beatmap_id: number;
+	beatmapset_id: number;
+	mods: number;
+	title: string;
+	version: string;
+	distance: number;
+};
+
 export type UserNeighbor = {
 	BeatmapID: number;
 	BeatmapsetID: number;
@@ -16,6 +25,7 @@ export type UserNeighbor = {
 	Version: string;
 	ZDistance: number;
 	Score: number;
+	Neighbors: NeighborInfo[];
 };
 
 export type BeatmapNeighbor = {

@@ -5,6 +5,7 @@
 
 	import { ModsList } from '$lib';
 	import Beatmap from '$lib/components/Beatmap.svelte';
+	import BeatmapDetailToggle from '$lib/components/BeatmapDetailToggle.svelte';
 	import BeatmapSearch from '$lib/components/BeatmapSearch.svelte';
 	import FilterButton from '$lib/components/FilterButton.svelte';
 	import Mod from '$lib/components/Mod.svelte';
@@ -12,7 +13,6 @@
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import UserSearch from '$lib/components/UserSearch.svelte';
 	import { faFileArrowDown, faInfoCircle, faStar } from '@fortawesome/free-solid-svg-icons';
-	import { pushState } from '$app/navigation';
 	import { page } from '$app/state';
 	import { buildUrl, getEnumMods, getModsEnum } from 'osu-web.js';
 	import Fa from 'svelte-fa';
@@ -23,7 +23,7 @@
 
 	let { data }: PageProps = $props();
 
-	let mods = $derived(page.state.mods ?? data.mods);
+	let mods = $derived(data.mods);
 	let enumMods = $derived(getEnumMods(mods));
 	let url = $derived.by(() => {
 		const url = new URL(page.url);
@@ -35,6 +35,8 @@
 
 	let excludedMods: number | undefined = $state(undefined);
 	let includedMods: number | undefined = $state(undefined);
+
+	let isDetailed: boolean = $state(false);
 
 	const query = $derived(
 		getBeatmapNeighbors({
@@ -159,6 +161,8 @@
 				</a>
 				<ShareButton {url} />
 				<RefetchButton queryFunction={query} />
+				<FilterButton bind:excludedMods bind:includedMods />
+				<BeatmapDetailToggle bind:isDetailed />
 			</div>
 		</div>
 		<div class="flex flex-row flex-wrap gap-2 max-2xl:justify-center">
@@ -167,86 +171,78 @@
 		</div>
 	</div>
 
-	<div class="bg-base-300 grid grid-cols-1 items-center gap-4 p-4 2xl:grid-cols-2">
-		<span class="inline-flex flex-row justify-center gap-2 2xl:justify-self-end">
-			{#if enumMods.length > 0}
-				<span class="inline-flex flex-row gap-1">
-					{#each enumMods as mod (mod)}
-						<Mod {mod} {@attach tooltip(mod)} />
-					{/each}
-				</span>
-			{/if}
-			<button onclick={() => addModModal?.showModal()} class="btn btn-primary btn-soft">
-				edit mods
-			</button>
-			<dialog id="add_mod_modal" class="modal" bind:this={addModModal}>
-				<div class="modal-box">
-					<form method="dialog">
-						<button class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2">✕</button>
-					</form>
+	<span class="bg-base-300 inline-flex w-full flex-row justify-center gap-2 py-4">
+		{#if enumMods.length > 0}
+			<span class="inline-flex flex-row gap-1">
+				{#each enumMods as mod (mod)}
+					<Mod {mod} {@attach tooltip(mod)} />
+				{/each}
+			</span>
+		{/if}
+		<button onclick={() => addModModal?.showModal()} class="btn btn-primary btn-soft">
+			edit mods
+		</button>
+		<dialog id="add_mod_modal" class="modal" bind:this={addModModal}>
+			<div class="modal-box">
+				<form method="dialog">
+					<button class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2">✕</button>
+				</form>
 
-					<h3 class="mb-2 text-lg font-bold">edit map mods</h3>
-					<ul class="inline-flex flex-row flex-wrap gap-2">
-						{#each ModsList as mod (mod)}
-							{@const [modVal] = getEnumMods(mod)}
-							{@const included = enumMods.includes(modVal)}
-							{@const updateContent = () => (included ? `remove ${modVal}` : `add ${modVal}`)}
-							<li>
-								<button
-									onclick={() => {
-										if (included) mods = getModsEnum(enumMods.filter((item) => item !== modVal));
-										else {
-											mods = getModsEnum(
-												[...enumMods, modVal].filter((item) => {
-													if (modVal === 'DT' || modVal === 'NC')
-														return item !== 'HT' && item !== 'DC';
-													else if (modVal === 'HT' || modVal === 'DC')
-														return item !== 'DT' && item !== 'NC';
-													else if (modVal === 'HR') return item !== 'EZ';
-													else if (modVal === 'EZ') return item !== 'HR';
-													else return true;
-												})
-											);
-										}
-										pushState(`/b/${data.beatmap.id}?mods=${mods}`, { ...page.state, mods });
-									}}
-									class="cursor-pointer transition-opacity"
-									class:opacity-20={!included}>
-									<Mod
-										mod={modVal}
-										{@attach tooltip(
-											updateContent(),
-											{
-												appendTo: addModModal
-											},
-											updateContent
-										)} />
-								</button>
-							</li>
-						{/each}
+				<h3 class="mb-2 text-lg font-bold">edit map mods</h3>
+				<ul class="inline-flex flex-row flex-wrap gap-2">
+					{#each ModsList as mod (mod)}
+						{@const [modVal] = getEnumMods(mod)}
+						{@const included = enumMods.includes(modVal)}
+						{@const updateContent = () => (included ? `remove ${modVal}` : `add ${modVal}`)}
 						<li>
 							<button
 								onclick={() => {
-									mods = 0;
-									enumMods = [];
-									pushState(`/b/${data.beatmap.id}?mods=${mods}`, { ...page.state, mods });
+									if (included) mods = getModsEnum(enumMods.filter((item) => item !== modVal));
+									else {
+										mods = getModsEnum(
+											[...enumMods, modVal].filter((item) => {
+												if (modVal === 'DT' || modVal === 'NC')
+													return item !== 'HT' && item !== 'DC';
+												else if (modVal === 'HT' || modVal === 'DC')
+													return item !== 'DT' && item !== 'NC';
+												else if (modVal === 'HR') return item !== 'EZ';
+												else if (modVal === 'EZ') return item !== 'HR';
+												else return true;
+											})
+										);
+									}
 								}}
-								class="btn btn-warning btn-soft">
-								reset
+								class="cursor-pointer transition-opacity"
+								class:opacity-20={!included}>
+								<Mod
+									mod={modVal}
+									{@attach tooltip(
+										updateContent(),
+										{
+											appendTo: addModModal
+										},
+										updateContent
+									)} />
 							</button>
 						</li>
-					</ul>
-				</div>
-				<form method="dialog" class="modal-backdrop">
-					<button>close</button>
-				</form>
-			</dialog>
-		</span>
-
-		<span class="flex flex-row max-2xl:justify-center">
-			<FilterButton bind:excludedMods bind:includedMods />
-		</span>
-	</div>
+					{/each}
+					<li>
+						<button
+							onclick={() => {
+								mods = 0;
+								enumMods = [];
+							}}
+							class="btn btn-warning btn-soft">
+							reset
+						</button>
+					</li>
+				</ul>
+			</div>
+			<form method="dialog" class="modal-backdrop">
+				<button>close</button>
+			</form>
+		</dialog>
+	</span>
 
 	<div class="grid min-h-[60svh] place-items-center py-4">
 		<svelte:boundary>
@@ -254,8 +250,21 @@
 
 			<ul class="grid w-full grid-cols-1 gap-4 px-4 lg:grid-cols-2">
 				{#each neighbors as neighbor, i (`${neighbor.BeatmapID}-${neighbor.Mods}`)}
+					{@const neighborExtended = {
+						...neighbor,
+						Neighbors: [
+							{
+								beatmap_id: data.beatmap.id,
+								beatmapset_id: data.beatmap.beatmapset_id,
+								mods: data.mods,
+								title: data.beatmap.beatmapset.title,
+								version: data.beatmap.version,
+								distance: neighbor.Distance
+							}
+						]
+					}}
 					<li transition:fade={{ duration: 500 }} animate:flip={{ duration: 500 }}>
-						<Beatmap {neighbor} rank={i + 1} />
+						<Beatmap neighbor={neighborExtended} rank={i + 1} {isDetailed} />
 					</li>
 				{:else}
 					<h2 class="col-span-2 text-center">
