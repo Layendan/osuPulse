@@ -50,7 +50,7 @@
 			alt="beatmapset cover" />
 		<div class="bg-base-100/80 pointer-events-none absolute inset-0 z-10"></div>
 		<a
-			href={resolve(`/b/{neighbor.BeatmapID}?mods={neighbor.Mods}`)}
+			href={resolve(`/b/${neighbor.BeatmapID}?mods=${neighbor.Mods}`)}
 			class="relative z-10 inline-flex w-full flex-row outline-none">
 			<div class="relative aspect-square h-full rounded-r-xl">
 				<img
