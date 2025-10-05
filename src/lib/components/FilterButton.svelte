@@ -48,7 +48,7 @@
 	filter
 </button>
 <dialog id="add_mod_modal" class="modal" bind:this={filterModal}>
-	<div class="modal-box">
+	<div class="modal-box text-start">
 		<form method="dialog">
 			<button class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2">✕</button>
 		</form>
