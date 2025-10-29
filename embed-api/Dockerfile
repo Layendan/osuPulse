@@ -12,7 +12,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN chmod +x ./osu_skills_rs_0.0.3_linux-x64
+RUN chmod +x ./osu_skills_rs_0.1.0_linux-x64
+RUN chmod +x ./Mapperator.ConsoleAppLinux
 
 EXPOSE 8000
 
