@@ -3,14 +3,12 @@ FROM python:3.13.7-slim
 WORKDIR /app
 
 # Install dependencies and .NET runtime
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    wget \
-    apt-transport-https \
-    && wget https://packages.microsoft.com/config/debian/13/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
-    && dpkg -i packages-microsoft-prod.deb \
+RUN apt-get update && apt-get install -y ca-certificates wget gnupg \
+    && wget -qO- https://packages.microsoft.com/keys/microsoft.asc | tee /etc/apt/trusted.gpg.d/microsoft.asc \
+    && echo "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/microsoft.asc] https://packages.microsoft.com/debian/13/prod stable main" | tee /etc/apt/sources.list.d/microsoft-prod.list \
     && apt-get update \
     && apt-get install -y dotnet-runtime-8.0 \
-    && rm -rf /var/lib/apt/lists/* packages-microsoft-prod.deb
+    && rm -rf /var/lib/apt/lists/*
 
 # Install other dependencies
 RUN apt-get install -y --no-install-recommends \
