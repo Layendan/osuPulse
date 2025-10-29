@@ -155,7 +155,7 @@
 			{@const { top_neighbors } = await query}
 
 			<ul class="grid w-full grid-cols-1 gap-4 px-4 lg:grid-cols-2">
-				{#each top_neighbors as neighbor, i (`${neighbor.BeatmapID}-${neighbor.Mods}`)}
+				{#each top_neighbors as neighbor, i (`${neighbor.BeatmapId}-${neighbor.Mods}`)}
 					<li transition:fade={{ duration: 500 }} animate:flip={{ duration: 500 }}>
 						<Beatmap {neighbor} rank={i + 1} {isDetailed} />
 					</li>

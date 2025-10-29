@@ -20,7 +20,7 @@
 	}: {
 		neighbor: Pick<
 			UserNeighbor,
-			'BeatmapsetID' | 'BeatmapID' | 'Mods' | 'Title' | 'Version' | 'Neighbors'
+			'BeatmapSetId' | 'BeatmapId' | 'Mods' | 'Title' | 'Version' | 'Neighbors'
 		> &
 			Partial<Pick<UserNeighbor, 'AvgAccuracy' | 'Score'>>;
 		rank: number;
@@ -45,17 +45,17 @@
 		class="relative inline-flex h-20 w-full flex-row overflow-clip rounded-xl"
 		class:rounded-b-none={isDetailed}>
 		<img
-			src={buildUrl.beatmapsetCover(neighbor.BeatmapsetID)}
+			src={buildUrl.beatmapsetCover(neighbor.BeatmapSetId)}
 			class="absolute z-0 h-full w-full object-cover blur-xs"
 			alt="beatmapset cover" />
 		<div class="bg-base-100/80 pointer-events-none absolute inset-0 z-10"></div>
 		<a
-			href={resolve(`/b/${neighbor.BeatmapID}?mods=${neighbor.Mods}`)}
+			href={resolve(`/b/${neighbor.BeatmapId}?mods=${neighbor.Mods}`)}
 			class="relative z-10 inline-flex w-full flex-row outline-none">
 			<div class="relative aspect-square h-full rounded-r-xl">
 				<img
-					src={buildUrl.beatmapsetThumbnail(neighbor.BeatmapsetID)}
-					class="aspect-square h-full rounded-r-xl object-cover transition-all group-focus-within:brightness-[20%] group-hover:brightness-[20%]"
+					src={buildUrl.beatmapsetThumbnail(neighbor.BeatmapSetId)}
+					class="aspect-square h-full rounded-r-xl object-cover transition-all group-focus-within:brightness-20 group-hover:brightness-20"
 					class:rounded-b-none={isDetailed}
 					alt="beatmapset thumbnail" />
 				<p
@@ -88,7 +88,7 @@
 			class="bg-base-300 z-10 flex w-0 items-center justify-center rounded-xl transition-[width] duration-200 group-focus-within:w-14 group-hover:w-14 md:w-4"
 			class:rounded-b-none={isDetailed}>
 			<a
-				href="osu://b/{neighbor.BeatmapID}"
+				href="osu://b/{neighbor.BeatmapId}"
 				class="opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100"
 				{@attach tooltip('open in osu!direct')}>
 				<Fa icon={faFileArrowDown} />
@@ -115,15 +115,15 @@
 								class="aspect-square h-14 rounded-xl object-cover"
 								alt="beatmapset thumbnail" />
 							<div class="inline-flex w-full flex-col">
-								<h1 class="line-clamp-1 text-lg font-semibold break-all">
+								<h1 class="-mb-0.5 line-clamp-1 text-lg font-semibold break-all">
 									{neighborInfo.title}
 								</h1>
-								<h2 class="line-clamp-1 text-base font-light break-all">
+								<h2 class="-mt-0.5 line-clamp-1 text-base font-light break-all">
 									[{neighborInfo.version}]
 								</h2>
 							</div>
 							<p class="ml-3 text-right text-base font-light">
-								<legend class="text-xs">Distance</legend>
+								<legend class="text-xs">Similarity</legend>
 								{neighborInfo.distance.toFixed(2)}
 							</p>
 						</a>

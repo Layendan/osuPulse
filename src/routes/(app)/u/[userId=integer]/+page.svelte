@@ -136,7 +136,7 @@
 					})}>
 					<Fa icon={faWater} />
 					<div
-						class="from-primary to-secondary group-hover:text-primary-content group-focus-within:text-primary-content group-disabled:text-neutral-content bg-gradient-to-r bg-clip-text text-transparent group-disabled:opacity-20">
+						class="from-primary to-secondary group-hover:text-primary-content group-focus-within:text-primary-content group-disabled:text-neutral-content bg-linear-to-r bg-clip-text text-transparent group-disabled:opacity-20">
 						{data.user.username}'s pulse
 					</div>
 				</a>
@@ -157,7 +157,7 @@
 			{@const { top_neighbors } = await query}
 
 			<ul class="grid w-full grid-cols-1 gap-4 px-4 lg:grid-cols-2">
-				{#each top_neighbors as neighbor, i (`${neighbor.BeatmapID}-${neighbor.Mods}`)}
+				{#each top_neighbors as neighbor, i (`${neighbor.BeatmapId}-${neighbor.Mods}`)}
 					<li transition:fade={{ duration: 500 }} animate:flip={{ duration: 500 }}>
 						<Beatmap {neighbor} rank={i + 1} {isDetailed} />
 					</li>

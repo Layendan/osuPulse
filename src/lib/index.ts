@@ -14,8 +14,8 @@ export type NeighborInfo = {
 };
 
 export type UserNeighbor = {
-	BeatmapID: number;
-	BeatmapsetID: number;
+	BeatmapId: number;
+	BeatmapSetId: number;
 	Mods: number;
 	Count: number;
 	AvgDistance: number;
@@ -29,8 +29,8 @@ export type UserNeighbor = {
 };
 
 export type BeatmapNeighbor = {
-	BeatmapID: number;
-	BeatmapsetID: number;
+	BeatmapId: number;
+	BeatmapSetId: number;
 	Mods: number;
 	Title: string;
 	Version: string;

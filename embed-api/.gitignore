@@ -189,3 +189,10 @@ pip-selfcheck.json
 
 beatmap_downloads/*
 skills_outputs/*
+extracted/**/*
+
+difficulty.parquet
+
+Mapperator.ConsoleAppLinux
+config.json
+online_cache.jsonl

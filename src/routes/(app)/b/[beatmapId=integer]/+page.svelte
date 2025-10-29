@@ -249,7 +249,7 @@
 			{@const { neighbors } = await query}
 
 			<ul class="grid w-full grid-cols-1 gap-4 px-4 lg:grid-cols-2">
-				{#each neighbors as neighbor, i (`${neighbor.BeatmapID}-${neighbor.Mods}`)}
+				{#each neighbors as neighbor, i (`${neighbor.BeatmapId}-${neighbor.Mods}`)}
 					{@const neighborExtended = {
 						...neighbor,
 						Neighbors: [

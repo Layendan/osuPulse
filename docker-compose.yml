@@ -38,6 +38,11 @@ services:
       retries: 3
     networks:
       - milvus
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '5'
 
   minio:
     container_name: milvus-minio
@@ -58,6 +63,11 @@ services:
       retries: 3
     networks:
       - milvus
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '5'
 
   standalone:
     container_name: milvus-standalone
@@ -86,6 +96,11 @@ services:
       - 'minio'
     networks:
       - milvus
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '5'
 
   embed-api:
     container_name: embed-api
@@ -106,6 +121,11 @@ services:
       - default
       - milvus
     restart: unless-stopped
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '5'
 
 networks:
   shared-proxy:

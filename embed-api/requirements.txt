@@ -3,7 +3,10 @@ aiosu
 numpy
 pandas
 fastapi
+pyarrow
 pydantic
 pymilvus
+rosu_pp_py
 scipy
+scikit-learn
 uvicorn
