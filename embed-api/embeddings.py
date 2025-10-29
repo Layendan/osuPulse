@@ -480,17 +480,9 @@ def generate_embeddings_and_insert_into_database(
         records.clear()
         print("Inserted final batch")
 
-    print("Creating indexes")
+    print("Flushing collection")
 
     client.flush(collection_name)
-    index_params = client.prepare_index_params()
-    index_params.add_index(
-        field_name="Embedding",
-        index_type="HNSW",
-        metric_type="L2",
-        params={"M": 16, "efConstruction": 200},
-    )
-    client.create_index(collection_name=collection_name, index_params=index_params)
 
     print("Finished")
 
