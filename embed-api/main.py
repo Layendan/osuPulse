@@ -169,6 +169,7 @@ async def download_missing_beatmapsets(client: MilvusClient):
             params = {
                 "m": "osu",
                 "s": "ranked",
+                "nsfw": "true",
                 "sort": "ranked_desc",
                 "ps": page_size,
                 "p": page,
@@ -182,15 +183,20 @@ async def download_missing_beatmapsets(client: MilvusClient):
             if not beatmapsets:
                 return index
 
+            num_missing = 0
             for beatmapset in beatmapsets:
                 if beatmapset["availability"]["download_disabled"]:
                     continue
                 if beatmapset_exists_in_milvus(client, beatmapset["id"]):
-                    return index
+                    continue
 
                 url = f"https://api.nerinyan.moe/d/{beatmapset['id']}?noBg=true&NoHitsound=true&NoStoryboard=true&noVideo=true"
                 await download_file(url, ROOT_DIR)
                 index += 1
+                num_missing += 1
+
+            if num_missing == 0:
+                return index
 
             page += 1
 
