@@ -15,12 +15,12 @@ export const getUserNeighbors = query(
 	object({
 		userId: pipe(number(), integer(), toMinValue(0)),
 		showNsfw: optional(boolean()),
-		minStars: optional(pipe(number(), integer(), toMinValue(0))),
-		maxStars: optional(pipe(number(), integer(), toMinValue(0))),
-		minPp: optional(pipe(number(), integer(), toMinValue(0))),
-		maxPp: optional(pipe(number(), integer(), toMinValue(0))),
-		minHitLength: optional(pipe(number(), integer(), toMinValue(0))),
-		maxHitLength: optional(pipe(number(), integer(), toMinValue(0))),
+		minStars: optional(pipe(number(), toMinValue(0))),
+		maxStars: optional(pipe(number(), toMinValue(0))),
+		minPp: optional(pipe(number(), toMinValue(0))),
+		maxPp: optional(pipe(number(), toMinValue(0))),
+		minHitLength: optional(pipe(number(), toMinValue(0))),
+		maxHitLength: optional(pipe(number(), toMinValue(0))),
 		excludedMods: optional(pipe(number(), integer(), toMinValue(0))),
 		includedMods: optional(pipe(number(), integer(), toMinValue(0)))
 	}),
