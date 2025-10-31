@@ -98,7 +98,7 @@
 
 		<label class="label">
 			<input type="checkbox" bind:checked={showNsfwTemp} class="toggle" />
-			show nsfw beatmaps
+			show explicit beatmaps
 		</label>
 
 		<div class="divider"></div>
