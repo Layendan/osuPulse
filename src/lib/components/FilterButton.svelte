@@ -11,7 +11,6 @@
 
 	interface FilterProps {
 		showNsfw?: boolean;
-		spotlightOnly?: boolean;
 		minStars?: number | undefined;
 		maxStars?: number | undefined;
 		minPp?: number | undefined;
@@ -24,7 +23,6 @@
 
 	let {
 		showNsfw = $bindable(true),
-		spotlightOnly = $bindable(false),
 		minStars = $bindable(undefined),
 		maxStars = $bindable(undefined),
 		minPp = $bindable(undefined),
@@ -38,7 +36,6 @@
 	let filterModal: HTMLDialogElement | undefined = $state(undefined);
 
 	let showNsfwTemp: boolean = $state(showNsfw);
-	let spotlightOnlyTemp: boolean = $state(spotlightOnly);
 
 	let minStarsTemp: number | undefined = $state(minStars);
 	let maxStarsTemp: number | undefined = $state(maxStars);
@@ -85,7 +82,6 @@
 			<button
 				onclick={() => {
 					showNsfwTemp = showNsfw;
-					spotlightOnlyTemp = spotlightOnly;
 					minStarsTemp = minStars;
 					maxStarsTemp = maxStars;
 					minPpTemp = minPp;
@@ -103,13 +99,6 @@
 		<label class="label">
 			<input type="checkbox" checked={showNsfwTemp} class="toggle" />
 			show nsfw beatmaps
-		</label>
-
-		<div class="divider"></div>
-
-		<label class="label">
-			<input type="checkbox" checked={spotlightOnlyTemp} class="toggle" />
-			only show spotlight beatmaps
 		</label>
 
 		<div class="divider"></div>
@@ -301,7 +290,6 @@
 				<button
 					onclick={() => {
 						showNsfw = showNsfwTemp;
-						spotlightOnly = spotlightOnlyTemp;
 						if (minStarsTemp)
 							minStars = maxStarsTemp ? Math.min(minStarsTemp, maxStarsTemp) : minStarsTemp;
 						if (maxStarsTemp)

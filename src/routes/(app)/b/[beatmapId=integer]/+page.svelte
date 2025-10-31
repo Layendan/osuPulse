@@ -34,7 +34,6 @@
 	let addModModal: HTMLDialogElement | undefined = $state(undefined);
 
 	let showNsfw: boolean = $state(true);
-	let spotlightOnly: boolean = $state(false);
 
 	let minStars: number | undefined = $state(undefined);
 	let maxStars: number | undefined = $state(undefined);
@@ -55,7 +54,6 @@
 			beatmapId: data.beatmap.id,
 			mods,
 			showNsfw,
-			spotlightOnly,
 			minStars,
 			maxStars,
 			minPp,
@@ -183,7 +181,6 @@
 				<RefetchButton queryFunction={query} />
 				<FilterButton
 					bind:showNsfw
-					bind:spotlightOnly
 					bind:minStars
 					bind:maxStars
 					bind:minPp

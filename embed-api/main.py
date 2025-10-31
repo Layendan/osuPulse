@@ -76,7 +76,6 @@ class BeatmapQuery(BaseModel):
     mods: int
     top_n: int = 10
     show_nsfw: bool = True
-    spotlight_only: bool = False
     min_stars: float | None = None
     max_stars: float | None = None
     min_pp: float | None = None
@@ -91,7 +90,6 @@ class UserRequest(BaseModel):
     user_id: int
     top_n_neighbors: int = 50
     show_nsfw: bool = True
-    spotlight_only: bool = False
     min_stars: float | None = None
     max_stars: float | None = None
     min_pp: float | None = None
@@ -364,7 +362,6 @@ def build_filter_template_expression(
     include_mods_filter: int | None = None,
     exclude_mods_filter: int | None = None,
     show_nsfw: bool = True,
-    spotlight_only: bool = False,
     min_stars: float | None = None,
     max_stars: float | None = None,
     min_pp: float | None = None,
@@ -411,10 +408,6 @@ def build_filter_template_expression(
     if not show_nsfw:
         expr_parts.append("Nsfw == false")
 
-    # spotlight_only filter (Spotlight field is bool)
-    if spotlight_only:
-        expr_parts.append("Spotlight == true")
-
     # Stars range filter (float)
     if min_stars is not None:
         expr_parts.append("Stars >= {min_stars}")
@@ -450,7 +443,6 @@ def find_similar_beatmaps_by_id(
     mod: int,
     top_n=10,
     show_nsfw: bool = True,
-    spotlight_only: bool = False,
     min_stars: float | None = None,
     max_stars: float | None = None,
     min_pp: float | None = None,
@@ -485,7 +477,6 @@ def find_similar_beatmaps_by_id(
         include_mods_filter,
         exclude_mods_filter,
         show_nsfw,
-        spotlight_only,
         min_stars,
         max_stars,
         min_pp,
@@ -615,7 +606,6 @@ def tally_neighbors(
     user_scores: list,
     top_n_neighbors=50,
     show_nsfw: bool = True,
-    spotlight_only: bool = False,
     min_stars: float | None = None,
     max_stars: float | None = None,
     min_pp: float | None = None,
@@ -652,7 +642,6 @@ def tally_neighbors(
             mod,
             top_n=10,
             show_nsfw=show_nsfw,
-            spotlight_only=spotlight_only,
             min_stars=min_stars,
             max_stars=max_stars,
             min_pp=min_pp,
@@ -752,7 +741,6 @@ async def api_similar_beatmaps(
     mods: int,
     top_n: int = 10,
     show_nsfw: bool = True,
-    spotlight_only: bool = False,
     min_stars: float | None = None,
     max_stars: float | None = None,
     min_pp: float | None = None,
@@ -768,7 +756,6 @@ async def api_similar_beatmaps(
         mods,
         top_n,
         show_nsfw,
-        spotlight_only,
         min_stars,
         max_stars,
         min_pp,
@@ -792,7 +779,6 @@ async def api_user_top_neighbors(req: UserRequest):
             user_scores,
             req.top_n_neighbors,
             req.show_nsfw,
-            req.spotlight_only,
             req.min_stars,
             req.max_stars,
             req.min_pp,
@@ -816,7 +802,6 @@ async def api_user_recent_neighbors(req: UserRequest):
             user_scores,
             req.top_n_neighbors,
             req.show_nsfw,
-            req.spotlight_only,
             req.min_stars,
             req.max_stars,
             req.min_pp,

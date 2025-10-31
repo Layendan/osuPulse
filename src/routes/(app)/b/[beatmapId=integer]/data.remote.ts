@@ -15,7 +15,6 @@ export const getBeatmapNeighbors = query(
 		beatmapId: pipe(number(), integer(), toMinValue(0)),
 		mods: pipe(number(), integer(), toMinValue(0)),
 		showNsfw: optional(boolean()),
-		spotlightOnly: optional(boolean()),
 		minStars: optional(pipe(number(), integer(), toMinValue(0))),
 		maxStars: optional(pipe(number(), integer(), toMinValue(0))),
 		minPp: optional(pipe(number(), integer(), toMinValue(0))),
@@ -29,7 +28,6 @@ export const getBeatmapNeighbors = query(
 		beatmapId,
 		mods = 0,
 		showNsfw,
-		spotlightOnly,
 		minStars,
 		maxStars,
 		minPp,
@@ -45,7 +43,6 @@ export const getBeatmapNeighbors = query(
 		url.searchParams.set('mods', mods.toString());
 		url.searchParams.set('top_n', '50');
 		if (showNsfw) url.searchParams.set('show_nsfw', showNsfw.toString());
-		if (spotlightOnly) url.searchParams.set('spotlight_only', spotlightOnly.toString());
 		if (minStars) url.searchParams.set('min_stars', minStars.toString());
 		if (maxStars) url.searchParams.set('max_stars', maxStars.toString());
 		if (minPp) url.searchParams.set('min_pp', minPp.toString());

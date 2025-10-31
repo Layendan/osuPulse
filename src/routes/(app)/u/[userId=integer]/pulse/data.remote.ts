@@ -15,7 +15,6 @@ export const getUserPulseNeighbors = query(
 	object({
 		userId: pipe(number(), integer(), toMinValue(0)),
 		showNsfw: optional(boolean()),
-		spotlightOnly: optional(boolean()),
 		minStars: optional(pipe(number(), integer(), toMinValue(0))),
 		maxStars: optional(pipe(number(), integer(), toMinValue(0))),
 		minPp: optional(pipe(number(), integer(), toMinValue(0))),
@@ -28,7 +27,6 @@ export const getUserPulseNeighbors = query(
 	async ({
 		userId,
 		showNsfw,
-		spotlightOnly,
 		minStars,
 		maxStars,
 		minPp,
@@ -48,7 +46,6 @@ export const getUserPulseNeighbors = query(
 			body: JSON.stringify({
 				user_id: userId,
 				show_nsfw: showNsfw,
-				spotlight_only: spotlightOnly,
 				min_stars: minStars,
 				max_stars: maxStars,
 				min_pp: minPp,

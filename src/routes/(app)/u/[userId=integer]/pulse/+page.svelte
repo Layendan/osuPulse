@@ -25,7 +25,6 @@
 	const pp = $derived(data.user.statistics.pp);
 
 	let showNsfw: boolean = $state(true);
-	let spotlightOnly: boolean = $state(false);
 
 	let minStars: number | undefined = $state(undefined);
 	let maxStars: number | undefined = $state(undefined);
@@ -45,7 +44,6 @@
 		getUserPulseNeighbors({
 			userId: data.user.id,
 			showNsfw,
-			spotlightOnly,
 			minStars,
 			maxStars,
 			minPp,
@@ -162,7 +160,6 @@
 				<RefetchButton queryFunction={query} />
 				<FilterButton
 					bind:showNsfw
-					bind:spotlightOnly
 					bind:minStars
 					bind:maxStars
 					bind:minPp
