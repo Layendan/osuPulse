@@ -81,7 +81,15 @@
 					rel="noopener noreferrer"
 					class="link link-primary">
 					osu!Skills
-				</a>, players can find similar beatmaps per skillset and then expand those to their top
+				</a>
+				as well as difficulty values from
+				<a
+					href="https://github.com/maxohn/rosu-pp"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="link link-primary">
+					rosu-pp
+				</a>, players can find similar beatmaps, as well as get recommendations based on their top
 				plays and recently played beatmaps.
 			</p>
 		</fieldset>
