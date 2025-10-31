@@ -10,15 +10,15 @@
 	import Mod from './Mod.svelte';
 
 	interface FilterProps {
-		showNsfw?: boolean;
-		minStars?: number | undefined;
-		maxStars?: number | undefined;
-		minPp?: number | undefined;
-		maxPp?: number | undefined;
-		minHitLength?: number | undefined;
-		maxHitLength?: number | undefined;
-		excludedMods?: number | undefined;
-		includedMods?: number | undefined;
+		showNsfw: boolean;
+		minStars: number | undefined;
+		maxStars: number | undefined;
+		minPp: number | undefined;
+		maxPp: number | undefined;
+		minHitLength: number | undefined;
+		maxHitLength: number | undefined;
+		excludedMods: number | undefined;
+		includedMods: number | undefined;
 	}
 
 	let {
@@ -97,7 +97,7 @@
 		<h3 class="mb-4 text-xl font-bold">filter settings</h3>
 
 		<label class="label">
-			<input type="checkbox" checked={showNsfwTemp} class="toggle" />
+			<input type="checkbox" bind:checked={showNsfwTemp} class="toggle" />
 			show nsfw beatmaps
 		</label>
 
