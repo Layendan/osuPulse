@@ -315,6 +315,17 @@
 	</div>
 
 	<form method="dialog" class="modal-backdrop">
-		<button>close</button>
+		<button
+			onclick={() => {
+				showNsfwTemp = showNsfw;
+				minStarsTemp = minStars;
+				maxStarsTemp = maxStars;
+				minPpTemp = minPp;
+				maxPpTemp = maxPp;
+				minHitLengthTemp = minHitLength;
+				maxHitLengthTemp = maxHitLength;
+				excludedModsTemp = excludedMods;
+				includedModsTemp = includedMods;
+			}}>close</button>
 	</form>
 </dialog>
