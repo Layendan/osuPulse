@@ -4,7 +4,7 @@ import { api } from '$lib/server';
 import { error } from '@sveltejs/kit';
 import { query } from '$app/server';
 import { EMBED_API_URL } from '$env/static/private';
-import { number, object, optional } from 'valibot';
+import { boolean, integer, number, object, optional, pipe, toMinValue } from 'valibot';
 
 type NeighborResponse = {
 	user_id: number;
@@ -12,8 +12,32 @@ type NeighborResponse = {
 };
 
 export const getUserPulseNeighbors = query(
-	object({ userId: number(), excludedMods: optional(number()), includedMods: optional(number()) }),
-	async ({ userId, excludedMods, includedMods }) => {
+	object({
+		userId: pipe(number(), integer(), toMinValue(0)),
+		showNsfw: optional(boolean()),
+		spotlightOnly: optional(boolean()),
+		minStars: optional(pipe(number(), integer(), toMinValue(0))),
+		maxStars: optional(pipe(number(), integer(), toMinValue(0))),
+		minPp: optional(pipe(number(), integer(), toMinValue(0))),
+		maxPp: optional(pipe(number(), integer(), toMinValue(0))),
+		minHitLength: optional(pipe(number(), integer(), toMinValue(0))),
+		maxHitLength: optional(pipe(number(), integer(), toMinValue(0))),
+		excludedMods: optional(pipe(number(), integer(), toMinValue(0))),
+		includedMods: optional(pipe(number(), integer(), toMinValue(0)))
+	}),
+	async ({
+		userId,
+		showNsfw,
+		spotlightOnly,
+		minStars,
+		maxStars,
+		minPp,
+		maxPp,
+		minHitLength,
+		maxHitLength,
+		excludedMods,
+		includedMods
+	}) => {
 		const url = new URL(`${EMBED_API_URL}/user_pulse/`);
 		const response = await fetch(url, {
 			method: 'POST',
@@ -23,6 +47,14 @@ export const getUserPulseNeighbors = query(
 			},
 			body: JSON.stringify({
 				user_id: userId,
+				show_nsfw: showNsfw,
+				spotlight_only: spotlightOnly,
+				min_stars: minStars,
+				max_stars: maxStars,
+				min_pp: minPp,
+				max_pp: maxPp,
+				min_hit_length: minHitLength,
+				max_hit_length: maxHitLength,
 				exclude_mods_filter: excludedMods,
 				include_mods_filter: includedMods
 			})

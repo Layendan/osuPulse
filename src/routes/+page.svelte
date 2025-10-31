@@ -51,7 +51,7 @@
 		welcome to
 		<br />
 		<div
-			class="from-primary to-secondary text-primary ff-only:text-transparent inline-block bg-gradient-to-r bg-clip-text">
+			class="from-primary to-secondary text-primary ff-only:text-transparent inline-block bg-linear-to-r bg-clip-text">
 			{#each title.split('') as char, i (i)}
 				<span
 					class="wave-bounce inline-block will-change-transform motion-reduce:animate-none"

@@ -24,6 +24,18 @@
 	const countryRank = $derived(data.user.statistics.country_rank);
 	const pp = $derived(data.user.statistics.pp);
 
+	let showNsfw: boolean = $state(true);
+	let spotlightOnly: boolean = $state(false);
+
+	let minStars: number | undefined = $state(undefined);
+	let maxStars: number | undefined = $state(undefined);
+
+	let minPp: number | undefined = $state(undefined);
+	let maxPp: number | undefined = $state(undefined);
+
+	let minHitLength: number | undefined = $state(undefined);
+	let maxHitLength: number | undefined = $state(undefined);
+
 	let excludedMods: number | undefined = $state(undefined);
 	let includedMods: number | undefined = $state(undefined);
 
@@ -32,6 +44,14 @@
 	const query = $derived(
 		getUserPulseNeighbors({
 			userId: data.user.id,
+			showNsfw,
+			spotlightOnly,
+			minStars,
+			maxStars,
+			minPp,
+			maxPp,
+			minHitLength,
+			maxHitLength,
 			excludedMods,
 			includedMods
 		})
@@ -140,7 +160,17 @@
 				</a>
 				<ShareButton />
 				<RefetchButton queryFunction={query} />
-				<FilterButton bind:excludedMods bind:includedMods />
+				<FilterButton
+					bind:showNsfw
+					bind:spotlightOnly
+					bind:minStars
+					bind:maxStars
+					bind:minPp
+					bind:maxPp
+					bind:minHitLength
+					bind:maxHitLength
+					bind:excludedMods
+					bind:includedMods />
 				<BeatmapDetailToggle bind:isDetailed />
 			</div>
 		</div>

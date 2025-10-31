@@ -75,6 +75,14 @@ class BeatmapQuery(BaseModel):
     beatmap_id: int
     mods: int
     top_n: int = 10
+    show_nsfw: bool = True
+    spotlight_only: bool = False
+    min_stars: float | None = None
+    max_stars: float | None = None
+    min_pp: float | None = None
+    max_pp: float | None = None
+    min_hit_length: float | None = None
+    max_hit_length: float | None = None
     exclude_mods_filter: int | None = None
     include_mods_filter: int | None = None
 
@@ -82,11 +90,16 @@ class BeatmapQuery(BaseModel):
 class UserRequest(BaseModel):
     user_id: int
     top_n_neighbors: int = 50
+    show_nsfw: bool = True
+    spotlight_only: bool = False
+    min_stars: float | None = None
+    max_stars: float | None = None
+    min_pp: float | None = None
+    max_pp: float | None = None
+    min_hit_length: float | None = None
+    max_hit_length: float | None = None
     exclude_mods_filter: int | None = None
     include_mods_filter: int | None = None
-
-
-search_params = {"metric_type": "L2", "params": {"ef": 64}, "hints": "iterative_filter"}
 
 
 @asynccontextmanager
@@ -347,43 +360,88 @@ async def process_new_ranked_maps(client: MilvusClient):
     print(f"Number of beatmapsets processed: {downloaded_len + 1}")
 
 
-def build_filter_expression(
-    include_mods_filter: int | None, exclude_mods_filter: int | None
+def build_filter_template_expression(
+    include_mods_filter: int | None = None,
+    exclude_mods_filter: int | None = None,
+    show_nsfw: bool = True,
+    spotlight_only: bool = False,
+    min_stars: float | None = None,
+    max_stars: float | None = None,
+    min_pp: float | None = None,
+    max_pp: float | None = None,
+    min_hit_length: float | None = None,
+    max_hit_length: float | None = None,
 ):
-    include_exprs = []
-    exclude_exprs = []
+    # Helper to find all mod values including bits of given filter bitmask
+    def expand_include_filter(filter_bit):
+        return [
+            val
+            for val in MOD_PRESETS_SKILLS.values()
+            if val != 0 and (val & filter_bit) == filter_bit
+        ]
 
-    # For inclusion, find all dictionary keys whose bits match the include_mods_filter pattern
-    if include_mods_filter is not None:
-        for _, val in MOD_PRESETS_SKILLS.items():
-            # Include if all bits in include_mods_filter are set in val
-            if (val & include_mods_filter) == include_mods_filter:
-                include_exprs.append(f"(Mods == {val})")
-        # Combine with OR
-        include_expr = "(" + " or ".join(include_exprs) + ")" if include_exprs else ""
+    # Helper to find all mod values including any excluded bits
+    def expand_exclude_filter(filter_bit):
+        return [
+            val
+            for val in MOD_PRESETS_SKILLS.values()
+            if val != 0 and (val & filter_bit) != 0
+        ]
 
-    else:
-        include_expr = ""
+    include_list = []
+    if include_mods_filter is not None and include_mods_filter != 0:
+        include_list = expand_include_filter(include_mods_filter)
 
-    # For exclusion, exclude any Mods equal to bitmasks that contain any excluded bits
-    if exclude_mods_filter is not None:
-        for _, val in MOD_PRESETS_SKILLS.items():
-            # Exclude if any bit in exclude_mods_filter is present in val
-            if (val & exclude_mods_filter) != 0:
-                exclude_exprs.append(f"(Mods != {val})")
-        # Combine with AND
-        exclude_expr = "(" + " and ".join(exclude_exprs) + ")" if exclude_exprs else ""
+    exclude_list = []
+    if exclude_mods_filter is not None and exclude_mods_filter != 0:
+        exclude_list = expand_exclude_filter(exclude_mods_filter)
 
-    else:
-        exclude_expr = ""
+    expr_parts = []
+    filter_params = {}
 
-    # Combine include and exclude expressions with AND if both present
-    if include_expr and exclude_expr:
-        expr = f"({include_expr} and {exclude_expr})"
-    else:
-        expr = include_expr or exclude_expr or ""
+    # Mods inclusion/exclusion
+    if include_list:
+        expr_parts.append("Mods in {include_mods}")
+        filter_params["include_mods"] = include_list
+    if exclude_list:
+        expr_parts.append("Mods not in {exclude_mods}")
+        filter_params["exclude_mods"] = exclude_list
 
-    return expr
+    # show_nsfw filter (Nsfw field is bool)
+    if not show_nsfw:
+        expr_parts.append("Nsfw == false")
+
+    # spotlight_only filter (Spotlight field is bool)
+    if spotlight_only:
+        expr_parts.append("Spotlight == true")
+
+    # Stars range filter (float)
+    if min_stars is not None:
+        expr_parts.append("Stars >= {min_stars}")
+        filter_params["min_stars"] = min_stars
+    if max_stars is not None:
+        expr_parts.append("Stars <= {max_stars}")
+        filter_params["max_stars"] = max_stars
+
+    # PP range filter (float)
+    if min_pp is not None:
+        expr_parts.append("PP >= {min_pp}")
+        filter_params["min_pp"] = min_pp
+    if max_pp is not None:
+        expr_parts.append("PP <= {max_pp}")
+        filter_params["max_pp"] = max_pp
+
+    # HitLength range filter (int16)
+    if min_hit_length is not None:
+        expr_parts.append("HitLength >= {min_hit_length}")
+        filter_params["min_hit_length"] = min_hit_length
+    if max_hit_length is not None:
+        expr_parts.append("HitLength <= {max_hit_length}")
+        filter_params["max_hit_length"] = max_hit_length
+
+    expr = " and ".join(expr_parts) if expr_parts else ""
+
+    return expr, filter_params
 
 
 def find_similar_beatmaps_by_id(
@@ -391,6 +449,14 @@ def find_similar_beatmaps_by_id(
     beatmap_id: int,
     mod: int,
     top_n=10,
+    show_nsfw: bool = True,
+    spotlight_only: bool = False,
+    min_stars: float | None = None,
+    max_stars: float | None = None,
+    min_pp: float | None = None,
+    max_pp: float | None = None,
+    min_hit_length: float | None = None,
+    max_hit_length: float | None = None,
     exclude_mods_filter: int | None = None,
     include_mods_filter: int | None = None,
 ):
@@ -415,12 +481,24 @@ def find_similar_beatmaps_by_id(
     query_record = res[0]
     query_vector = query_record["Embedding"]
 
-    expr = build_filter_expression(include_mods_filter, exclude_mods_filter)
+    expr, filter_params = build_filter_template_expression(
+        include_mods_filter,
+        exclude_mods_filter,
+        show_nsfw,
+        spotlight_only,
+        min_stars,
+        max_stars,
+        min_pp,
+        max_pp,
+        min_hit_length,
+        max_hit_length,
+    )
 
     search_results = client.search(
         collection_name=COLLECTION_NAME,
         data=[query_vector],
         filter=expr,
+        filter_params=filter_params,
         anns_field="Embedding",
         limit=top_n + 1,
         output_fields=[
@@ -536,6 +614,14 @@ def tally_neighbors(
     client: MilvusClient,
     user_scores: list,
     top_n_neighbors=50,
+    show_nsfw: bool = True,
+    spotlight_only: bool = False,
+    min_stars: float | None = None,
+    max_stars: float | None = None,
+    min_pp: float | None = None,
+    max_pp: float | None = None,
+    min_hit_length: float | None = None,
+    max_hit_length: float | None = None,
     exclude_mods_filter: int | None = None,
     include_mods_filter: int | None = None,
 ):
@@ -565,6 +651,14 @@ def tally_neighbors(
             beatmap_id,
             mod,
             top_n=10,
+            show_nsfw=show_nsfw,
+            spotlight_only=spotlight_only,
+            min_stars=min_stars,
+            max_stars=max_stars,
+            min_pp=min_pp,
+            max_pp=max_pp,
+            min_hit_length=min_hit_length,
+            max_hit_length=max_hit_length,
             exclude_mods_filter=exclude_mods_filter,
             include_mods_filter=include_mods_filter,
         )
@@ -657,6 +751,14 @@ async def api_similar_beatmaps(
     beatmap_id: int,
     mods: int,
     top_n: int = 10,
+    show_nsfw: bool = True,
+    spotlight_only: bool = False,
+    min_stars: float | None = None,
+    max_stars: float | None = None,
+    min_pp: float | None = None,
+    max_pp: float | None = None,
+    min_hit_length: float | None = None,
+    max_hit_length: float | None = None,
     exclude_mods_filter: int | None = None,
     include_mods_filter: int | None = None,
 ):
@@ -665,6 +767,14 @@ async def api_similar_beatmaps(
         beatmap_id,
         mods,
         top_n,
+        show_nsfw,
+        spotlight_only,
+        min_stars,
+        max_stars,
+        min_pp,
+        max_pp,
+        min_hit_length,
+        max_hit_length,
         exclude_mods_filter,
         include_mods_filter,
     )
@@ -681,6 +791,14 @@ async def api_user_top_neighbors(req: UserRequest):
             app.state.milvus_client,
             user_scores,
             req.top_n_neighbors,
+            req.show_nsfw,
+            req.spotlight_only,
+            req.min_stars,
+            req.max_stars,
+            req.min_pp,
+            req.max_pp,
+            req.min_hit_length,
+            req.max_hit_length,
             req.exclude_mods_filter,
             req.include_mods_filter,
         )
@@ -697,6 +815,14 @@ async def api_user_recent_neighbors(req: UserRequest):
             app.state.milvus_client,
             user_scores,
             req.top_n_neighbors,
+            req.show_nsfw,
+            req.spotlight_only,
+            req.min_stars,
+            req.max_stars,
+            req.min_pp,
+            req.max_pp,
+            req.min_hit_length,
+            req.max_hit_length,
             req.exclude_mods_filter,
             req.include_mods_filter,
         )

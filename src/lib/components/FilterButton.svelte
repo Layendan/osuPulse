@@ -10,16 +10,48 @@
 	import Mod from './Mod.svelte';
 
 	interface FilterProps {
-		excludedMods: number | undefined;
-		includedMods: number | undefined;
+		showNsfw?: boolean;
+		spotlightOnly?: boolean;
+		minStars?: number | undefined;
+		maxStars?: number | undefined;
+		minPp?: number | undefined;
+		maxPp?: number | undefined;
+		minHitLength?: number | undefined;
+		maxHitLength?: number | undefined;
+		excludedMods?: number | undefined;
+		includedMods?: number | undefined;
 	}
 
-	let { excludedMods = $bindable(), includedMods = $bindable() }: FilterProps = $props();
+	let {
+		showNsfw = $bindable(true),
+		spotlightOnly = $bindable(false),
+		minStars = $bindable(undefined),
+		maxStars = $bindable(undefined),
+		minPp = $bindable(undefined),
+		maxPp = $bindable(undefined),
+		minHitLength = $bindable(undefined),
+		maxHitLength = $bindable(undefined),
+		excludedMods = $bindable(undefined),
+		includedMods = $bindable(undefined)
+	}: FilterProps = $props();
 
 	let filterModal: HTMLDialogElement | undefined = $state(undefined);
-	let excludedModsTemp: number | undefined = $state(undefined);
+
+	let showNsfwTemp: boolean = $state(showNsfw);
+	let spotlightOnlyTemp: boolean = $state(spotlightOnly);
+
+	let minStarsTemp: number | undefined = $state(minStars);
+	let maxStarsTemp: number | undefined = $state(maxStars);
+
+	let minPpTemp: number | undefined = $state(minPp);
+	let maxPpTemp: number | undefined = $state(maxPp);
+
+	let minHitLengthTemp: number | undefined = $state(minHitLength);
+	let maxHitLengthTemp: number | undefined = $state(maxHitLength);
+
+	let excludedModsTemp: number | undefined = $state(excludedMods);
 	let excludedEnumMods = $derived(excludedModsTemp ? getEnumMods(excludedModsTemp) : []);
-	let includedModsTemp: number | undefined = $state(undefined);
+	let includedModsTemp: number | undefined = $state(includedMods);
 	let includedEnumMods = $derived(includedModsTemp ? getEnumMods(includedModsTemp) : []);
 
 	function tooltip(
@@ -47,11 +79,118 @@
 	<Fa icon={faFilter} />
 	filter
 </button>
-<dialog id="add_mod_modal" class="modal" bind:this={filterModal}>
+<dialog id="add_mod_modal" class="modal max-md:modal-bottom" bind:this={filterModal}>
 	<div class="modal-box text-start">
 		<form method="dialog">
-			<button class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2">✕</button>
+			<button
+				onclick={() => {
+					showNsfwTemp = showNsfw;
+					spotlightOnlyTemp = spotlightOnly;
+					minStarsTemp = minStars;
+					maxStarsTemp = maxStars;
+					minPpTemp = minPp;
+					maxPpTemp = maxPp;
+					minHitLengthTemp = minHitLength;
+					maxHitLengthTemp = maxHitLength;
+					excludedModsTemp = excludedMods;
+					includedModsTemp = includedMods;
+				}}
+				class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2">✕</button>
 		</form>
+
+		<h3 class="mb-4 text-xl font-bold">filter settings</h3>
+
+		<label class="label">
+			<input type="checkbox" checked={showNsfwTemp} class="toggle" />
+			show nsfw beatmaps
+		</label>
+
+		<div class="divider"></div>
+
+		<label class="label">
+			<input type="checkbox" checked={spotlightOnlyTemp} class="toggle" />
+			only show spotlight beatmaps
+		</label>
+
+		<div class="divider"></div>
+
+		<h3 class="mb-3 text-lg font-bold">star range</h3>
+		<div class="join">
+			<label class="floating-label join-item mr-2">
+				<span class="label">min. stars</span>
+				<input
+					type="number"
+					placeholder="minimum star value"
+					bind:value={minStarsTemp}
+					min="0"
+					max={maxStarsTemp}
+					class="input" />
+			</label>
+
+			<label class="floating-label join-item">
+				<span class="label">max. stars</span>
+				<input
+					type="number"
+					placeholder="maximum star value"
+					bind:value={maxStarsTemp}
+					min={minStarsTemp}
+					class="input" />
+			</label>
+		</div>
+
+		<div class="divider"></div>
+
+		<h3 class="mb-3 text-lg font-bold">performance points range</h3>
+		<div class="join">
+			<label class="floating-label join-item mr-2">
+				<span class="label">min. pp</span>
+				<input
+					type="number"
+					placeholder="minimum pp value"
+					bind:value={minPpTemp}
+					min="0"
+					max={maxPpTemp}
+					class="input" />
+			</label>
+
+			<label class="floating-label join-item">
+				<span class="label">max. pp</span>
+				<input
+					type="number"
+					placeholder="maximum pp value"
+					bind:value={maxPpTemp}
+					min={minPpTemp}
+					class="input" />
+			</label>
+		</div>
+
+		<div class="divider"></div>
+
+		<h3 class="mb-3 text-lg font-bold">song length range (seconds)</h3>
+		<div class="join">
+			<label class="floating-label join-item mr-2">
+				<span class="label">min. length</span>
+				<input
+					type="number"
+					placeholder="minimum length"
+					bind:value={minHitLengthTemp}
+					min="0"
+					max={maxHitLengthTemp}
+					class="input" />
+			</label>
+
+			<label class="floating-label join-item">
+				<span class="label">max. length</span>
+				<input
+					type="number"
+					placeholder="maximum length"
+					bind:value={maxHitLengthTemp}
+					min={minHitLengthTemp}
+					class="input" />
+			</label>
+		</div>
+
+		<div class="divider"></div>
 
 		<h3 class="mb-2 text-lg font-bold">exclude mods</h3>
 		<ul class="mb-2 inline-flex flex-row flex-wrap gap-2">
@@ -157,6 +296,22 @@
 			<form method="dialog">
 				<button
 					onclick={() => {
+						showNsfw = showNsfwTemp;
+						spotlightOnly = spotlightOnlyTemp;
+						if (minStarsTemp)
+							minStars = maxStarsTemp ? Math.min(minStarsTemp, maxStarsTemp) : minStarsTemp;
+						if (maxStarsTemp)
+							maxStars = minStarsTemp ? Math.max(minStarsTemp, maxStarsTemp) : maxStarsTemp;
+						if (minPpTemp) minPp = maxPpTemp ? Math.min(minPpTemp, maxPpTemp) : minPpTemp;
+						if (maxPpTemp) maxPp = minPpTemp ? Math.max(minPpTemp, maxPpTemp) : maxPpTemp;
+						if (minHitLengthTemp)
+							minHitLength = maxHitLengthTemp
+								? Math.min(minHitLengthTemp, maxHitLengthTemp)
+								: minHitLengthTemp;
+						if (maxHitLengthTemp)
+							maxHitLength = minHitLengthTemp
+								? Math.max(minHitLengthTemp, maxHitLengthTemp)
+								: maxHitLengthTemp;
 						excludedMods = excludedModsTemp;
 						includedMods = includedModsTemp;
 					}}

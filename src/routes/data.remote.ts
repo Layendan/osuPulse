@@ -15,22 +15,32 @@ export const navigateToBeatmap = form(
 			error(400, 'Invalid URL');
 		}
 
-		// Try "/beatmapsets/{setId}#osu/{beatmapId}" form first
+		// Define URLPatterns for the two cases
+		const pattern1 = new URLPattern({
+			hostname: 'osu.ppy.sh',
+			pathname: '/beatmapsets/:setId',
+			hash: 'osu/:beatmapId'
+		});
+
+		const pattern2 = new URLPattern({
+			hostname: 'osu.ppy.sh',
+			pathname: '/b/:beatmapId'
+		});
+
 		let beatmapId: number | null = null;
 
-		// Case 1: /beatmapsets/{setId}#osu/{beatmapId}
-		const beatmapsetMatch = parsedUrl.pathname.match(/^\/beatmapsets\/\d+$/);
-		if (beatmapsetMatch) {
-			const hashMatch = parsedUrl.hash.match(/^#osu\/(\d+)$/);
-			if (hashMatch) {
-				beatmapId = parseInt(hashMatch[1], 10);
-			}
+		// Try matching first pattern: /beatmapsets/{setId}#osu/{beatmapId}
+		const match1 = pattern1.exec(parsedUrl.href);
+		if (match1 && match1.hash && match1.hash.groups.beatmapId) {
+			beatmapId = parseInt(match1.hash.groups.beatmapId, 10);
 		}
 
-		// Case 2: /b/{beatmapId}
-		const bMatch = parsedUrl.pathname.match(/^\/b\/(\d+)$/);
-		if (bMatch) {
-			beatmapId = parseInt(bMatch[1], 10);
+		// If no match, try second pattern: /b/{beatmapId}
+		if (beatmapId === null) {
+			const match2 = pattern2.exec(parsedUrl.href);
+			if (match2 && match2.pathname && match2.pathname.groups.beatmapId) {
+				beatmapId = parseInt(match2.pathname.groups.beatmapId, 10);
+			}
 		}
 
 		if (!beatmapId || isNaN(beatmapId)) {
