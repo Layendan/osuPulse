@@ -29,7 +29,7 @@
 				width="80"
 				height="80"></enhanced:img>
 			<h1
-				class="from-primary to-secondary inline-block bg-gradient-to-r bg-clip-text text-transparent">
+				class="from-primary to-secondary inline-block bg-linear-to-r bg-clip-text text-transparent">
 				osu!Pulse
 			</h1>
 		</a>

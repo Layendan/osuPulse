@@ -115,8 +115,8 @@
 		<div class="divider"></div>
 
 		<h3 class="mb-3 text-lg font-bold">star range</h3>
-		<div class="join">
-			<label class="floating-label join-item mr-2">
+		<div class="grid w-full max-w-sm grid-cols-2 gap-2">
+			<label class="floating-label">
 				<span class="label">min. stars</span>
 				<input
 					type="number"
@@ -127,7 +127,7 @@
 					class="input" />
 			</label>
 
-			<label class="floating-label join-item">
+			<label class="floating-label">
 				<span class="label">max. stars</span>
 				<input
 					type="number"
@@ -141,8 +141,8 @@
 		<div class="divider"></div>
 
 		<h3 class="mb-3 text-lg font-bold">performance points range</h3>
-		<div class="join">
-			<label class="floating-label join-item mr-2">
+		<div class="grid w-full max-w-sm grid-cols-2 gap-2">
+			<label class="floating-label">
 				<span class="label">min. pp</span>
 				<input
 					type="number"
@@ -150,16 +150,18 @@
 					bind:value={minPpTemp}
 					min="0"
 					max={maxPpTemp}
+					step="50"
 					class="input" />
 			</label>
 
-			<label class="floating-label join-item">
+			<label class="floating-label">
 				<span class="label">max. pp</span>
 				<input
 					type="number"
 					placeholder="maximum pp value"
 					bind:value={maxPpTemp}
 					min={minPpTemp}
+					step="50"
 					class="input" />
 			</label>
 		</div>
@@ -167,8 +169,8 @@
 		<div class="divider"></div>
 
 		<h3 class="mb-3 text-lg font-bold">song length range (seconds)</h3>
-		<div class="join">
-			<label class="floating-label join-item mr-2">
+		<div class="grid w-full max-w-sm grid-cols-2 gap-2">
+			<label class="floating-label">
 				<span class="label">min. length</span>
 				<input
 					type="number"
@@ -176,16 +178,18 @@
 					bind:value={minHitLengthTemp}
 					min="0"
 					max={maxHitLengthTemp}
+					step="30"
 					class="input" />
 			</label>
 
-			<label class="floating-label join-item">
+			<label class="floating-label">
 				<span class="label">max. length</span>
 				<input
 					type="number"
 					placeholder="maximum length"
 					bind:value={maxHitLengthTemp}
 					min={minHitLengthTemp}
+					step="30"
 					class="input" />
 			</label>
 		</div>

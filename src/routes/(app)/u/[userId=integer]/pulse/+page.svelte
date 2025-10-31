@@ -137,7 +137,7 @@
 	<div class="bg-base-300 grid grid-cols-1 items-center gap-4 p-4 2xl:grid-cols-2">
 		<div class="flex flex-col justify-around gap-2 text-center 2xl:justify-self-end">
 			<h2
-				class="from-primary to-secondary bg-gradient-to-r bg-clip-text text-4xl font-bold text-transparent 2xl:text-end">
+				class="from-primary to-secondary bg-linear-to-r bg-clip-text text-4xl font-bold text-transparent 2xl:text-end">
 				{data.user.username}'s pulse
 				<button
 					class="text-base-content cursor-context-menu text-xl"

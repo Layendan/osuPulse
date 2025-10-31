@@ -9,7 +9,7 @@
 
 <fieldset class="fieldset rounded-box border-base-300 bg-base-200 w-xs border p-4">
 	<legend
-		class="fieldset-legend from-primary to-secondary inline-block bg-gradient-to-r bg-clip-text text-transparent">
+		class="fieldset-legend from-primary to-secondary inline-block bg-linear-to-r bg-clip-text text-transparent">
 		pulse
 	</legend>
 	<form
