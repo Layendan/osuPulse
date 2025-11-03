@@ -114,13 +114,13 @@ async def lifespan(app: FastAPI):
     app.state.aiosu_client = aiosu_client
 
     cleanup_dirs()
-    ingest_task = asyncio.create_task(background_beatmap_ingest(app))
+    # ingest_task = asyncio.create_task(background_beatmap_ingest(app))
 
     yield
 
     await aiosu_client.aclose()
     client.close()
-    ingest_task.cancel()
+    # ingest_task.cancel()
 
 
 app = FastAPI(lifespan=lifespan)
