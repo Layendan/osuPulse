@@ -80,8 +80,8 @@ class BeatmapQuery(BaseModel):
     max_stars: float | None = None
     min_pp: float | None = None
     max_pp: float | None = None
-    min_hit_length: float | None = None
-    max_hit_length: float | None = None
+    min_hit_length: int | None = None
+    max_hit_length: int | None = None
     exclude_mods_filter: int | None = None
     include_mods_filter: int | None = None
 
@@ -94,8 +94,8 @@ class UserRequest(BaseModel):
     max_stars: float | None = None
     min_pp: float | None = None
     max_pp: float | None = None
-    min_hit_length: float | None = None
-    max_hit_length: float | None = None
+    min_hit_length: int | None = None
+    max_hit_length: int | None = None
     exclude_mods_filter: int | None = None
     include_mods_filter: int | None = None
 
@@ -447,8 +447,8 @@ def find_similar_beatmaps_by_id(
     max_stars: float | None = None,
     min_pp: float | None = None,
     max_pp: float | None = None,
-    min_hit_length: float | None = None,
-    max_hit_length: float | None = None,
+    min_hit_length: int | None = None,
+    max_hit_length: int | None = None,
     exclude_mods_filter: int | None = None,
     include_mods_filter: int | None = None,
 ):
@@ -610,8 +610,8 @@ def tally_neighbors(
     max_stars: float | None = None,
     min_pp: float | None = None,
     max_pp: float | None = None,
-    min_hit_length: float | None = None,
-    max_hit_length: float | None = None,
+    min_hit_length: int | None = None,
+    max_hit_length: int | None = None,
     exclude_mods_filter: int | None = None,
     include_mods_filter: int | None = None,
 ):
@@ -745,8 +745,8 @@ async def api_similar_beatmaps(
     max_stars: float | None = None,
     min_pp: float | None = None,
     max_pp: float | None = None,
-    min_hit_length: float | None = None,
-    max_hit_length: float | None = None,
+    min_hit_length: int | None = None,
+    max_hit_length: int | None = None,
     exclude_mods_filter: int | None = None,
     include_mods_filter: int | None = None,
 ):
