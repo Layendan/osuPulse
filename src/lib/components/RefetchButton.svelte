@@ -9,6 +9,8 @@
 
 	let { queryFunction }: { queryFunction: RemoteQuery<unknown> } = $props();
 
+	const loading = $derived($state.eager(queryFunction.loading));
+
 	function tooltip(
 		content: string,
 		props?: Partial<Props>,
@@ -30,12 +32,12 @@
 <button
 	onclick={() => queryFunction.refresh()}
 	class="btn btn-warning btn-soft group"
-	disabled={queryFunction.loading}
-	aria-disabled={queryFunction.loading}
+	disabled={loading}
+	aria-disabled={loading}
 	{@attach tooltip('refresh osu! data', {
 		placement: 'bottom'
 	})}>
-	{#if queryFunction.loading}
+	{#if loading}
 		<span class="loading loading-ring"></span>
 	{:else}
 		<Fa icon={faRotate} class="group-hover:animate-spin" />

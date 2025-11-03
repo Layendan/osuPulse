@@ -23,9 +23,10 @@
 
 	let { data }: PageProps = $props();
 
-	let mods = $derived(data.mods);
+	const beatmap = $derived($state.eager(data.beatmap));
+	let mods = $derived($state.eager(data.mods));
 	let enumMods = $derived(getEnumMods(mods));
-	let url = $derived.by(() => {
+	const url = $derived.by(() => {
 		const url = new URL(page.url);
 		url.searchParams.set('mods', mods.toString());
 		return url.href;
@@ -51,7 +52,7 @@
 
 	const query = $derived(
 		getBeatmapNeighbors({
-			beatmapId: data.beatmap.id,
+			beatmapId: beatmap.id,
 			mods,
 			showNsfw,
 			minStars,
@@ -84,69 +85,67 @@
 </script>
 
 <svelte:head>
-	<title>osu!Pulse - Recommended maps for {data.beatmap.beatmapset.title}</title>
+	<title>osu!Pulse - Recommended maps for {beatmap.beatmapset.title}</title>
 	<meta
 		name="description"
-		content="Get detailed data for {data.beatmap.beatmapset
+		content="Get detailed data for {beatmap.beatmapset
 			.title} with osu!Pulse. View key stats, difficulty levels, and performance insights while exploring personalized recommendations for similar maps to enhance your osu! gameplay experience." />
 	<meta name="twitter:card" content="summary" />
 	<meta
 		name="twitter:title"
-		content="osu!Pulse - Recommended maps for {data.beatmap.beatmapset.title}" />
+		content="osu!Pulse - Recommended maps for {beatmap.beatmapset.title}" />
 	<meta
 		name="twitter:description"
-		content="Get detailed data for {data.beatmap.beatmapset
+		content="Get detailed data for {beatmap.beatmapset
 			.title} with osu!Pulse. View key stats, difficulty levels, and performance insights while exploring personalized recommendations for similar maps to enhance your osu! gameplay experience." />
 	<meta property="og:type" content="website" />
-	<meta
-		property="og:title"
-		content="osu!Pulse - Recommended maps for {data.beatmap.beatmapset.title}" />
+	<meta property="og:title" content="osu!Pulse - Recommended maps for {beatmap.beatmapset.title}" />
 	<meta
 		property="og:description"
-		content="Get detailed data for {data.beatmap.beatmapset
+		content="Get detailed data for {beatmap.beatmapset
 			.title} with osu!Pulse. View key stats, difficulty levels, and performance insights while exploring personalized recommendations for similar maps to enhance your osu! gameplay experience." />
 	<meta property="og:url" content="https://pulse.layendan.dev" />
 	<meta property="og:site_name" content="osu!Pulse" />
 	<meta property="og:locale" content="en_US" />
-	<meta property="og:image" content={data.beatmap.beatmapset.covers['card@2x']} />
-	<meta property="og:image:alt" content="{data.beatmap.beatmapset.title} card" />
-	<meta property="og:image:secure_url" content={data.beatmap.beatmapset.covers['card@2x']} />
+	<meta property="og:image" content={beatmap.beatmapset.covers['card@2x']} />
+	<meta property="og:image:alt" content="{beatmap.beatmapset.title} card" />
+	<meta property="og:image:secure_url" content={beatmap.beatmapset.covers['card@2x']} />
 </svelte:head>
 
 <div class="bg-base-200 container mx-auto gap-2 overflow-clip rounded-xl" id="main">
 	<a
-		href={buildUrl.beatmap(data.beatmap.id)}
+		href={buildUrl.beatmap(beatmap.id)}
 		target="_blank"
 		rel="noopener noreferrer"
 		class="relative grid w-full place-items-center px-4">
 		<img
-			src={data.beatmap.beatmapset.covers['cover@2x']}
+			src={beatmap.beatmapset.covers['cover@2x']}
 			class="absolute h-full w-full object-cover"
 			alt="beatmap cover"
 			fetchpriority="high" />
 		<div class="bg-base-100/80 absolute h-full w-full backdrop-blur-xs"></div>
 		<div class="z-10 my-2 inline-flex items-center gap-4">
 			<img
-				src={data.beatmap.beatmapset.covers['card@2x']}
+				src={beatmap.beatmapset.covers['card@2x']}
 				class="aspect-square size-20 rounded-2xl object-cover md:size-32 md:rounded-4xl"
 				alt="beatmap card" />
 			<div class="inline-flex flex-col gap-2">
 				<span class="inline-flex flex-col gap-0">
-					<h1 class="text-3xl font-bold md:text-5xl">{data.beatmap.beatmapset.title}</h1>
-					<h2 class="text-xl font-light md:text-2xl">[{data.beatmap.version}]</h2>
+					<h1 class="text-3xl font-bold md:text-5xl">{beatmap.beatmapset.title}</h1>
+					<h2 class="text-xl font-light md:text-2xl">[{beatmap.version}]</h2>
 				</span>
 				<span class="inline-flex gap-4">
 					<h2 class="text-3xl font-light">
 						<legend class="text-xs">Star Rating</legend>
 						<span class="inline-flex flex-row items-center gap-1">
-							{new Intl.NumberFormat().format(data.beatmap.difficulty_rating)}
+							{new Intl.NumberFormat().format(beatmap.difficulty_rating)}
 							<Fa icon={faStar} class="text-xl" />
 						</span>
 					</h2>
-					{#if data.beatmap.bpm}
+					{#if beatmap.bpm}
 						<h2 class="text-3xl font-light">
 							<legend class="text-xs">Beats Per Minute</legend>
-							{new Intl.NumberFormat().format(data.beatmap.bpm)}bpm
+							{new Intl.NumberFormat().format(beatmap.bpm)}bpm
 						</h2>
 					{/if}
 				</span>
@@ -161,7 +160,7 @@
 				<button
 					class="cursor-context-menu text-xl"
 					{@attach tooltip(
-						`these beatmaps are the most similar to ${data.beatmap.beatmapset.title}, based on the estimated skills required to pass it (accuracy, aim, flashlight, precision, reaction, stamina, and streams)`,
+						`these beatmaps are the most similar to ${beatmap.beatmapset.title}, based on the estimated skills required to pass it (accuracy, aim, flashlight, precision, reaction, stamina, and streams)`,
 						{ placement: 'bottom' }
 					)}>
 					<Fa icon={faInfoCircle} />
@@ -169,7 +168,7 @@
 			</h2>
 			<div class="inline-flex flex-row flex-wrap justify-center gap-2 2xl:justify-end">
 				<a
-					href="osu://b/{data.beatmap.id}"
+					href="osu://b/{beatmap.id}"
 					class="btn btn-soft btn-secondary"
 					{@attach tooltip('open in osu!direct', {
 						placement: 'bottom'
@@ -281,11 +280,11 @@
 						...neighbor,
 						Neighbors: [
 							{
-								beatmap_id: data.beatmap.id,
-								beatmapset_id: data.beatmap.beatmapset_id,
+								beatmap_id: beatmap.id,
+								beatmapset_id: beatmap.beatmapset_id,
 								mods: data.mods,
-								title: data.beatmap.beatmapset.title,
-								version: data.beatmap.version,
+								title: beatmap.beatmapset.title,
+								version: beatmap.version,
 								distance: neighbor.Distance
 							}
 						]
@@ -295,7 +294,7 @@
 					</li>
 				{:else}
 					<h2 class="col-span-2 text-center">
-						{#if data.beatmap.status !== 'ranked'}
+						{#if beatmap.status !== 'ranked'}
 							currently, only ranked beatmaps are available
 						{:else}
 							no beatmaps found
