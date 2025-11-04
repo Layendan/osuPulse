@@ -30,7 +30,7 @@
 </script>
 
 <button
-	onclick={() => queryFunction.refresh()}
+	onclick={() => $state.eager(queryFunction).refresh()}
 	class="btn btn-warning btn-soft group"
 	disabled={loading}
 	aria-disabled={loading}
