@@ -52,7 +52,7 @@
 
 	const query = $derived(
 		getBeatmapNeighbors({
-			beatmapId: beatmap.id,
+			beatmapId: data.beatmap.id,
 			mods,
 			showNsfw,
 			minStars,
