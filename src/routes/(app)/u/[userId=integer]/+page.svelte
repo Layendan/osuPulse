@@ -20,10 +20,9 @@
 
 	let { data }: PageProps = $props();
 
-	const user = $derived(data.user);
-	const globalRank = $derived(user.statistics.global_rank);
-	const countryRank = $derived(user.statistics.country_rank);
-	const pp = $derived(user.statistics.pp);
+	const globalRank = $derived(data.user.statistics.global_rank);
+	const countryRank = $derived(data.user.statistics.country_rank);
+	const pp = $derived(data.user.statistics.pp);
 
 	let showNsfw: boolean = $state(true);
 
@@ -66,47 +65,47 @@
 </script>
 
 <svelte:head>
-	<title>osu!Pulse - Recommended maps for {user.username}</title>
+	<title>osu!Pulse - Recommended maps for {data.user.username}</title>
 	<meta
 		name="description"
 		content="Explore your osu!Pulse profile to view tailored beatmap recommendations powered by your own gameplay stats. Uncover new osu! maps custom-matched to your unique style and skills for the ultimate personalized experience." />
 	<meta name="twitter:card" content="summary" />
-	<meta name="twitter:title" content="osu!Pulse - Recommended maps for {user.username}" />
+	<meta name="twitter:title" content="osu!Pulse - Recommended maps for {data.user.username}" />
 	<meta
 		name="twitter:description"
 		content="Explore your osu!Pulse profile to view tailored beatmap recommendations powered by your own gameplay stats. Uncover new osu! maps custom-matched to your unique style and skills for the ultimate personalized experience." />
 	<meta property="og:type" content="website" />
-	<meta property="og:title" content="osu!Pulse - Recommended maps for {user.username}" />
+	<meta property="og:title" content="osu!Pulse - Recommended maps for {data.user.username}" />
 	<meta
 		property="og:description"
 		content="Explore your osu!Pulse profile to view tailored beatmap recommendations powered by your own gameplay stats. Uncover new osu! maps custom-matched to your unique style and skills for the ultimate personalized experience." />
 	<meta property="og:url" content="https://pulse.layendan.dev" />
 	<meta property="og:site_name" content="osu!Pulse" />
 	<meta property="og:locale" content="en_US" />
-	<meta property="og:image" content={user.avatar_url} />
-	<meta property="og:image:alt" content="{user.username} avatar" />
-	<meta property="og:image:secure_url" content={user.avatar_url} />
+	<meta property="og:image" content={data.user.avatar_url} />
+	<meta property="og:image:alt" content="{data.user.username} avatar" />
+	<meta property="og:image:secure_url" content={data.user.avatar_url} />
 </svelte:head>
 
 <div class="bg-base-200 container mx-auto gap-2 overflow-clip rounded-xl" id="main">
 	<a
-		href={buildUrl.user(user.id)}
+		href={buildUrl.user(data.user.id)}
 		target="_blank"
 		rel="noopener noreferrer"
 		class="relative grid w-full place-items-center px-4">
 		<img
-			src={user.cover.custom_url ?? user.cover.url}
+			src={data.user.cover.custom_url ?? data.user.cover.url}
 			class="absolute h-full w-full object-cover"
 			alt="user cover"
 			fetchpriority="high" />
 		<div class="bg-base-100/80 absolute h-full w-full backdrop-blur-xs"></div>
 		<div class="z-10 my-2 inline-flex items-center gap-4">
 			<img
-				src={user.avatar_url}
+				src={data.user.avatar_url}
 				class="aspect-square size-20 rounded-2xl md:size-32 md:rounded-4xl"
 				alt="user avatar" />
 			<div class="inline-flex flex-col gap-2">
-				<h1 class="text-3xl font-bold md:text-5xl">{user.username}</h1>
+				<h1 class="text-3xl font-bold md:text-5xl">{data.user.username}</h1>
 				<span class="inline-flex gap-4">
 					<h2 class="text-3xl font-light">
 						<legend class="text-xs">Global Ranking</legend>
@@ -148,15 +147,15 @@
 			</h2>
 			<div class="inline-flex flex-row flex-wrap justify-center gap-2 2xl:justify-end">
 				<a
-					href="{user.id}/pulse"
+					href="{data.user.id}/pulse"
 					class="btn btn-soft btn-primary group"
-					{@attach tooltip(`beatmaps from ${user.username}'s play session`, {
+					{@attach tooltip(`beatmaps from ${data.user.username}'s play session`, {
 						placement: 'bottom'
 					})}>
 					<Fa icon={faWater} />
 					<div
 						class="from-primary to-secondary group-hover:text-primary-content group-focus-within:text-primary-content group-disabled:text-neutral-content bg-linear-to-r bg-clip-text text-transparent group-disabled:opacity-20">
-						{user.username}'s pulse
+						{data.user.username}'s pulse
 					</div>
 				</a>
 				<ShareButton />
