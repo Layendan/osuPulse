@@ -20,7 +20,7 @@
 
 	let { data }: PageProps = $props();
 
-	const user = $derived($state.eager(data.user));
+	const user = $derived(data.user);
 	const globalRank = $derived(user.statistics.global_rank);
 	const countryRank = $derived(user.statistics.country_rank);
 	const pp = $derived(user.statistics.pp);

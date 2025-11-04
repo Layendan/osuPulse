@@ -23,8 +23,8 @@
 
 	let { data }: PageProps = $props();
 
-	const beatmap = $derived($state.eager(data.beatmap));
-	let mods = $derived($state.eager(data.mods));
+	const beatmap = $derived(data.beatmap);
+	let mods = $derived(data.mods);
 	let enumMods = $derived(getEnumMods(mods));
 	const url = $derived.by(() => {
 		const url = new URL(page.url);
