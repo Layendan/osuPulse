@@ -9,7 +9,7 @@
 
 	let { queryFunction }: { queryFunction: RemoteQuery<unknown> } = $props();
 
-	const loading = $derived($state.eager(queryFunction.loading));
+	const loading = $derived(queryFunction.loading);
 
 	function tooltip(
 		content: string,
@@ -30,7 +30,7 @@
 </script>
 
 <button
-	onclick={() => $state.eager(queryFunction).refresh()}
+	onclick={() => queryFunction.refresh()}
 	class="btn btn-warning btn-soft group"
 	disabled={loading}
 	aria-disabled={loading}
