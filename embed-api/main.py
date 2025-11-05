@@ -723,7 +723,7 @@ def tally_neighbors(
         entry["Score"] = (
             (((0.1 * log2(count + 1)) + 0.9) * ((2 ** (avg_weight**4)) - 1))
             / (avg_distance + epsilon)
-            * distances[i]
+            # * distances[i]
             * penalty
         )
     summary_sorted = sorted(summary, key=lambda x: -x["Score"])
