@@ -725,7 +725,7 @@ def tally_neighbors(
     for i, entry in enumerate(summary):
         count = entry["Count"]
         min_distance = entry["MinDistance"]
-        min_weight = entry["M<inWeight"]
+        min_weight = entry["MinWeight"]
         penalty = entry["Penalty"]
         # entry["ZDistance"] = distances[i]
         entry["Score"] = (
