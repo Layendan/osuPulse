@@ -698,7 +698,7 @@ def tally_neighbors(
         # min_distance = (
         #     (sum(val["distances"]) / count) / max_distance if max_distance else 0
         # )
-        min_distance = min(val["distances"])
+        min_distance = min(val["distances"]) / max_distance if max_distance else 0
         max_weight = max(val["weights"])
         avg_accuracy = sum(val["accuracies"]) / count
         penalty = 1.0
