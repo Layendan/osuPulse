@@ -21,6 +21,8 @@ export const getUserNeighbors = query(
 		maxPp: optional(pipe(number(), toMinValue(0))),
 		minHitLength: optional(pipe(number(), integer(), toMinValue(0))),
 		maxHitLength: optional(pipe(number(), integer(), toMinValue(0))),
+		minBpm: optional(pipe(number(), toMinValue(0))),
+		maxBpm: optional(pipe(number(), toMinValue(0))),
 		excludedMods: optional(pipe(number(), integer(), toMinValue(0))),
 		includedMods: optional(pipe(number(), integer(), toMinValue(0)))
 	}),
@@ -33,6 +35,8 @@ export const getUserNeighbors = query(
 		maxPp,
 		minHitLength,
 		maxHitLength,
+		minBpm,
+		maxBpm,
 		excludedMods,
 		includedMods
 	}) => {
@@ -52,6 +56,8 @@ export const getUserNeighbors = query(
 				max_pp: maxPp,
 				min_hit_length: minHitLength,
 				max_hit_length: maxHitLength,
+				min_bpm: minBpm,
+				max_bpm: maxBpm,
 				exclude_mods_filter: excludedMods,
 				include_mods_filter: includedMods
 			})

@@ -81,6 +81,8 @@ class BeatmapQuery(BaseModel):
     max_pp: float | None = None
     min_hit_length: int | None = None
     max_hit_length: int | None = None
+    min_bpm: float | None = None
+    max_bpm: float | None = None
     exclude_mods_filter: int | None = None
     include_mods_filter: int | None = None
 
@@ -95,6 +97,8 @@ class UserRequest(BaseModel):
     max_pp: float | None = None
     min_hit_length: int | None = None
     max_hit_length: int | None = None
+    min_bpm: float | None = None
+    max_bpm: float | None = None
     exclude_mods_filter: int | None = None
     include_mods_filter: int | None = None
 
@@ -169,6 +173,8 @@ def cleanup_dirs():
     shutil.rmtree(ROOT_DIR, ignore_errors=True)
     shutil.rmtree(SKILLS_DIR, ignore_errors=True)
     shutil.rmtree(MAPPERATOR_DIR, ignore_errors=True)
+    os.remove(DIFFICULTY_FILE)
+
     os.makedirs(ROOT_DIR, exist_ok=True)
     os.makedirs(SKILLS_DIR, exist_ok=True)
     os.makedirs(MAPPERATOR_DIR, exist_ok=True)
@@ -375,6 +381,8 @@ def build_filter_template_expression(
     max_pp: float | None = None,
     min_hit_length: float | None = None,
     max_hit_length: float | None = None,
+    min_bpm: float | None = None,
+    max_bpm: float | None = None,
 ):
     # Helper to find all mod values including bits of given filter bitmask
     def expand_include_filter(filter_bit):
@@ -439,6 +447,14 @@ def build_filter_template_expression(
         expr_parts.append("HitLength <= {max_hit_length}")
         filter_params["max_hit_length"] = max_hit_length
 
+    # Bpm range filter (float)
+    if min_bpm is not None:
+        expr_parts.append("Bpm >= {min_bpm}")
+        filter_params["min_bpm"] = min_bpm
+    if max_bpm is not None:
+        expr_parts.append("Bpm <= {max_bpm}")
+        filter_params["max_bpm"] = max_bpm
+
     expr = " and ".join(expr_parts) if expr_parts else ""
 
     return expr, filter_params
@@ -456,6 +472,8 @@ def find_similar_beatmaps_by_id(
     max_pp: float | None = None,
     min_hit_length: int | None = None,
     max_hit_length: int | None = None,
+    min_bpm: float | None = None,
+    max_bpm: float | None = None,
     exclude_mods_filter: int | None = None,
     include_mods_filter: int | None = None,
 ):
@@ -490,6 +508,8 @@ def find_similar_beatmaps_by_id(
         max_pp,
         min_hit_length,
         max_hit_length,
+        min_bpm,
+        max_bpm,
     )
 
     search_results = client.search(
@@ -619,6 +639,8 @@ def tally_neighbors(
     max_pp: float | None = None,
     min_hit_length: int | None = None,
     max_hit_length: int | None = None,
+    min_bpm: float | None = None,
+    max_bpm: float | None = None,
     exclude_mods_filter: int | None = None,
     include_mods_filter: int | None = None,
 ):
@@ -655,6 +677,8 @@ def tally_neighbors(
             max_pp=max_pp,
             min_hit_length=min_hit_length,
             max_hit_length=max_hit_length,
+            min_bpm=min_bpm,
+            max_bpm=max_bpm,
             exclude_mods_filter=exclude_mods_filter,
             include_mods_filter=include_mods_filter,
         )
@@ -757,6 +781,8 @@ async def api_similar_beatmaps(
     max_pp: float | None = None,
     min_hit_length: int | None = None,
     max_hit_length: int | None = None,
+    min_bpm: float | None = None,
+    max_bpm: float | None = None,
     exclude_mods_filter: int | None = None,
     include_mods_filter: int | None = None,
 ):
@@ -772,6 +798,8 @@ async def api_similar_beatmaps(
         max_pp,
         min_hit_length,
         max_hit_length,
+        min_bpm,
+        max_bpm,
         exclude_mods_filter,
         include_mods_filter,
     )
@@ -795,6 +823,8 @@ async def api_user_top_neighbors(req: UserRequest):
             req.max_pp,
             req.min_hit_length,
             req.max_hit_length,
+            req.min_bpm,
+            req.max_bpm,
             req.exclude_mods_filter,
             req.include_mods_filter,
         )
@@ -818,6 +848,8 @@ async def api_user_recent_neighbors(req: UserRequest):
             req.max_pp,
             req.min_hit_length,
             req.max_hit_length,
+            req.min_bpm,
+            req.max_bpm,
             req.exclude_mods_filter,
             req.include_mods_filter,
         )

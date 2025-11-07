@@ -17,6 +17,8 @@
 		maxPp: number | undefined;
 		minHitLength: number | undefined;
 		maxHitLength: number | undefined;
+		minBpm: number | undefined;
+		maxBpm: number | undefined;
 		excludedMods: number | undefined;
 		includedMods: number | undefined;
 	}
@@ -29,6 +31,8 @@
 		maxPp = $bindable(undefined),
 		minHitLength = $bindable(undefined),
 		maxHitLength = $bindable(undefined),
+		minBpm = $bindable(undefined),
+		maxBpm = $bindable(undefined),
 		excludedMods = $bindable(undefined),
 		includedMods = $bindable(undefined)
 	}: FilterProps = $props();
@@ -179,6 +183,34 @@
 					bind:value={maxHitLengthTemp}
 					min={minHitLengthTemp}
 					step="30"
+					class="input" />
+			</label>
+		</div>
+
+		<div class="divider"></div>
+
+		<h3 class="mb-3 text-lg font-bold">song bpm</h3>
+		<div class="grid w-full max-w-sm grid-cols-2 gap-2">
+			<label class="floating-label">
+				<span class="label">min. bpm</span>
+				<input
+					type="number"
+					placeholder="minimum bpm"
+					bind:value={minBpm}
+					min="0"
+					max={maxBpm}
+					step="30"
+					class="input" />
+			</label>
+
+			<label class="floating-label">
+				<span class="label">max. bpm</span>
+				<input
+					type="number"
+					placeholder="maximum bpm"
+					bind:value={maxBpm}
+					min={minBpm}
+					step="10"
 					class="input" />
 			</label>
 		</div>

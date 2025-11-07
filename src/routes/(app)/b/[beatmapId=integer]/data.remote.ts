@@ -21,6 +21,8 @@ export const getBeatmapNeighbors = query(
 		maxPp: optional(pipe(number(), toMinValue(0))),
 		minHitLength: optional(pipe(number(), integer(), toMinValue(0))),
 		maxHitLength: optional(pipe(number(), integer(), toMinValue(0))),
+		minBpm: optional(pipe(number(), toMinValue(0))),
+		maxBpm: optional(pipe(number(), toMinValue(0))),
 		excludedMods: optional(pipe(number(), integer(), toMinValue(0))),
 		includedMods: optional(pipe(number(), integer(), toMinValue(0)))
 	}),
@@ -34,6 +36,8 @@ export const getBeatmapNeighbors = query(
 		maxPp,
 		minHitLength,
 		maxHitLength,
+		minBpm,
+		maxBpm,
 		excludedMods,
 		includedMods
 	}) => {
@@ -49,6 +53,8 @@ export const getBeatmapNeighbors = query(
 		if (maxPp) url.searchParams.set('max_pp', maxPp.toString());
 		if (minHitLength) url.searchParams.set('min_hit_length', minHitLength.toString());
 		if (maxHitLength) url.searchParams.set('max_hit_length', maxHitLength.toString());
+		if (minBpm) url.searchParams.set('min_bpm', minBpm.toString());
+		if (maxBpm) url.searchParams.set('max_bpm', maxBpm.toString());
 		if (excludedMods) url.searchParams.set('exclude_mods_filter', excludedMods.toString());
 		if (includedMods) url.searchParams.set('include_mods_filter', includedMods.toString());
 

@@ -44,6 +44,9 @@
 	let minHitLength: number | undefined = $state(undefined);
 	let maxHitLength: number | undefined = $state(undefined);
 
+	let minBpm: number | undefined = $state(undefined);
+	let maxBpm: number | undefined = $state(undefined);
+
 	let excludedMods: number | undefined = $state(undefined);
 	let includedMods: number | undefined = $state(undefined);
 
@@ -187,6 +190,8 @@
 					bind:maxPp
 					bind:minHitLength
 					bind:maxHitLength
+					bind:minBpm
+					bind:maxBpm
 					bind:excludedMods
 					bind:includedMods />
 				<BeatmapDetailToggle bind:isDetailed />
