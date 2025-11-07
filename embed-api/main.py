@@ -705,7 +705,7 @@ def tally_neighbors(
         avg_accuracy = sum(val["accuracies"]) / count
         penalty = 1.0
         if key[0] in beatmap_to_index:
-            penalty = 0.8 ** beatmap_to_index[key[0]]
+            penalty = 0
         summary.append(
             {
                 "BeatmapId": key[0],
