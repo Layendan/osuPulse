@@ -173,7 +173,8 @@ def cleanup_dirs():
     shutil.rmtree(ROOT_DIR, ignore_errors=True)
     shutil.rmtree(SKILLS_DIR, ignore_errors=True)
     shutil.rmtree(MAPPERATOR_DIR, ignore_errors=True)
-    os.remove(DIFFICULTY_FILE)
+    if os.path.exists(DIFFICULTY_FILE):
+        os.remove(DIFFICULTY_FILE)
 
     os.makedirs(ROOT_DIR, exist_ok=True)
     os.makedirs(SKILLS_DIR, exist_ok=True)
