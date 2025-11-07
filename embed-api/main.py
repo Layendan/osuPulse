@@ -130,8 +130,12 @@ async def background_beatmap_ingest(app):
     while True:
         client = app.state.milvus_client
         print("Processing new beatmaps")
-        await process_new_ranked_maps(client)
-        await asyncio.sleep(1800)  # 30 minutes
+        try:
+            await process_new_ranked_maps(client)
+        except Exception as e:
+            print(f"Error processing new beatmaps: {e}")
+        finally:
+            await asyncio.sleep(1800)  # 30 minutes
 
 
 async def download_file(url: str, filepath: str):
@@ -221,6 +225,7 @@ def calculate_strains():
         "BeatmapSetFolder",
         "BeatmapFile",
     ]
+    print("Reading metadata parquet file")
     df = pd.read_parquet(METADATA_FILE)
     results = []
     batch_size = 1000
@@ -240,7 +245,10 @@ def calculate_strains():
         map = rosu.Beatmap(path=path)
 
         if map.is_suspicious():
+            print(f"Skipping suspicious beatmap: {row.Id}")
             continue
+
+        print(f"Processing strain values for beatmap: {row.Id}")
 
         for _, mod_val in MOD_PRESETS_SKILLS.items():
             diff = rosu.Difficulty(mods=mod_val)
