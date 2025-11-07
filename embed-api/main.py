@@ -699,7 +699,7 @@ def tally_neighbors(
         #     (sum(val["distances"]) / count) / max_distance if max_distance else 0
         # )
         min_distance = min(val["distances"])
-        min_weight = min(val["weights"])
+        max_weight = max(val["weights"])
         avg_accuracy = sum(val["accuracies"]) / count
         penalty = 1.0
         if key[0] in beatmap_to_index:
@@ -711,7 +711,7 @@ def tally_neighbors(
                 "Mods": key[2],
                 "Count": count,
                 "MinDistance": min_distance,
-                "MinWeight": min_weight,
+                "MaxWeight": max_weight,
                 "AvgAccuracy": avg_accuracy,
                 "Title": val["title"],
                 "Version": val["version"],
@@ -725,11 +725,11 @@ def tally_neighbors(
     for i, entry in enumerate(summary):
         count = entry["Count"]
         min_distance = entry["MinDistance"]
-        min_weight = entry["MinWeight"]
+        max_weight = entry["MaxWeight"]
         penalty = entry["Penalty"]
         # entry["ZDistance"] = distances[i]
         entry["Score"] = (
-            (((0.1 * log2(count + 1)) + 0.9) * ((2 ** (min_weight**4)) - 1))
+            (((0.1 * log2(count + 1)) + 0.9) * ((2 ** (max_weight**4)) - 1))
             / (min_distance + epsilon)
             # * distances[i]
             * penalty
