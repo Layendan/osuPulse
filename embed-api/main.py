@@ -14,11 +14,10 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 import rosu_pp_py as rosu
+from embeddings import generate_embeddings_and_insert_into_database
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from pymilvus import MilvusClient
-
-from embeddings import generate_embeddings_and_insert_into_database
 
 COLUMNS_TO_USE = [
     "BeatmapId",
@@ -133,7 +132,7 @@ async def background_beatmap_ingest(app):
         try:
             await process_new_ranked_maps(client)
         except Exception as e:
-            print(f"Error processing new beatmaps: {e}")
+            print(f"Error processing new beatmaps: {str(e)}")
         finally:
             await asyncio.sleep(1800)  # 30 minutes
 
@@ -696,10 +695,11 @@ def tally_neighbors(
     }
     for key, val in neighbor_info.items():
         count = len(val["distances"])
-        avg_distance = (
-            (sum(val["distances"]) / count) / max_distance if max_distance else 0
-        )
-        avg_weight = sum(val["weights"]) / count
+        # min_distance = (
+        #     (sum(val["distances"]) / count) / max_distance if max_distance else 0
+        # )
+        min_distance = min(val["distances"])
+        min_weight = min(val["weights"])
         avg_accuracy = sum(val["accuracies"]) / count
         penalty = 1.0
         if key[0] in beatmap_to_index:
@@ -710,8 +710,8 @@ def tally_neighbors(
                 "BeatmapSetId": key[1],
                 "Mods": key[2],
                 "Count": count,
-                "AvgDistance": avg_distance,
-                "AvgWeight": avg_weight,
+                "MinDistance": min_distance,
+                "MinWeight": min_weight,
                 "AvgAccuracy": avg_accuracy,
                 "Title": val["title"],
                 "Version": val["version"],
@@ -721,16 +721,16 @@ def tally_neighbors(
         )
     if not summary:
         return []
-    distances = np.exp(-((np.array([entry["AvgDistance"] for entry in summary])) ** 2))
+    # distances = np.exp(-((np.array([entry["MinDistance"] for entry in summary])) ** 2))
     for i, entry in enumerate(summary):
         count = entry["Count"]
-        avg_distance = entry["AvgDistance"]
-        avg_weight = entry["AvgWeight"]
+        min_distance = entry["MinDistance"]
+        min_weight = entry["M<inWeight"]
         penalty = entry["Penalty"]
-        entry["ZDistance"] = distances[i]
+        # entry["ZDistance"] = distances[i]
         entry["Score"] = (
-            (((0.1 * log2(count + 1)) + 0.9) * ((2 ** (avg_weight**4)) - 1))
-            / (avg_distance + epsilon)
+            (((0.1 * log2(count + 1)) + 0.9) * ((2 ** (min_weight**4)) - 1))
+            / (min_distance + epsilon)
             # * distances[i]
             * penalty
         )
