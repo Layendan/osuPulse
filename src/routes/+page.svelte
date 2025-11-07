@@ -3,6 +3,7 @@
 	import type { Props } from 'tippy.js';
 
 	import BeatmapSearch from '$lib/components/BeatmapSearch.svelte';
+	import OsuLogo from '$lib/components/OsuLogo.svelte';
 	import PulseSearch from '$lib/components/PulseSearch.svelte';
 	import UserSearch from '$lib/components/UserSearch.svelte';
 	import { faDiscord, faGithub } from '@fortawesome/free-brands-svg-icons';
@@ -112,12 +113,20 @@
 					<Fa icon={faDiscord} />
 				</a>
 				<a
-					href="https://github.com/Layendan/Osu!Pulse"
+					href="https://github.com/Layendan/osuPulse"
 					target="_blank"
 					rel="noopener noreferrer"
 					class="text-2xl"
 					{@attach tooltip('github')}>
 					<Fa icon={faGithub} />
+				</a>
+				<a
+					href="https://osu.ppy.sh/users/13263918"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="size-6"
+					{@attach tooltip('osu!')}>
+					<OsuLogo />
 				</a>
 			</span>
 		</fieldset>
