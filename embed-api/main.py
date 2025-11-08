@@ -66,6 +66,7 @@ MAPPERATOR_DIR = "extracted"
 DATA_DIR = os.path.join(MAPPERATOR_DIR, "data")
 METADATA_FILE = os.path.join(MAPPERATOR_DIR, "metadata.parquet")
 DIFFICULTY_FILE = "difficulty.parquet"
+ONLINE_CACHE_PATH = "online_cache.jsonl"
 
 COLLECTION_NAME = "osu_beatmap_collection"
 
@@ -175,6 +176,8 @@ def cleanup_dirs():
     shutil.rmtree(MAPPERATOR_DIR, ignore_errors=True)
     if os.path.exists(DIFFICULTY_FILE):
         os.remove(DIFFICULTY_FILE)
+    if os.path.exists(ONLINE_CACHE_PATH):
+        os.remove(ONLINE_CACHE_PATH)
 
     os.makedirs(ROOT_DIR, exist_ok=True)
     os.makedirs(SKILLS_DIR, exist_ok=True)
