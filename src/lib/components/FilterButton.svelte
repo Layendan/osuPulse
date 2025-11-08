@@ -199,7 +199,7 @@
 					bind:value={minBpm}
 					min="0"
 					max={maxBpm}
-					step="30"
+					step="10"
 					class="input" />
 			</label>
 
