@@ -387,6 +387,7 @@ def build_filter_template_expression(
     max_hit_length: float | None = None,
     min_bpm: float | None = None,
     max_bpm: float | None = None,
+    exclude_beatmapset_id: int | None = None,
 ):
     # Helper to find all mod values including bits of given filter bitmask
     def expand_include_filter(filter_bit):
@@ -459,6 +460,11 @@ def build_filter_template_expression(
         expr_parts.append("Bpm <= {max_bpm}")
         filter_params["max_bpm"] = max_bpm
 
+    # Exclude other maps from the same beatmapset
+    if exclude_beatmapset_id is not None:
+        expr_parts.append("BeatmapSetId != {beatmapsetid}")
+        filter_params["beatmapsetid"] = exclude_beatmapset_id
+
     expr = " and ".join(expr_parts) if expr_parts else ""
 
     return expr, filter_params
@@ -480,6 +486,7 @@ def find_similar_beatmaps_by_id(
     max_bpm: float | None = None,
     exclude_mods_filter: int | None = None,
     include_mods_filter: int | None = None,
+    exclude_beatmapset: bool = False,
 ):
     """Nearest Neighbor Beatmap Search"""
     expr = f"(BeatmapId == {beatmap_id}) and (Mods == {mod})"
@@ -514,6 +521,9 @@ def find_similar_beatmaps_by_id(
         max_hit_length,
         min_bpm,
         max_bpm,
+        exclude_beatmapset_id=(
+            query_record["BeatmapSetId"] if exclude_beatmapset else None
+        ),
     )
 
     search_results = client.search(
@@ -659,7 +669,7 @@ def tally_neighbors(
             "version": None,
         }
     )
-    max_distance = None
+    # max_distance = None
     for idx, score in enumerate(user_scores):
         beatmap_id = score["beatmap"]["id"]
         mod = (
@@ -685,12 +695,15 @@ def tally_neighbors(
             max_bpm=max_bpm,
             exclude_mods_filter=exclude_mods_filter,
             include_mods_filter=include_mods_filter,
+            exclude_beatmapset=True,
         )
         if neighbor_rows is None:
             continue
         for row in neighbor_rows:
             key = (row["BeatmapId"], row["BeatmapSetId"], row["Mods"])
-            neighbor_info[key]["distances"].append(row["Distance"])
+            neighbor_info[key]["distances"].append(
+                row["Distance"] / neighbor_rows[-1]["Distance"]
+            )
             neighbor_info[key]["neighbors"].append(
                 {
                     "beatmap_id": beatmap_id,
@@ -714,8 +727,8 @@ def tally_neighbors(
                 neighbor_info[key]["title"] = row["Title"]
             if neighbor_info[key]["version"] is None:
                 neighbor_info[key]["version"] = row["Version"]
-            if max_distance is None or row["Distance"] > max_distance:
-                max_distance = row["Distance"]
+            # if max_distance is None or row["Distance"] > max_distance:
+            #     max_distance = row["Distance"]
     epsilon = 1e-6
     summary = []
     beatmap_to_index = {
@@ -726,9 +739,10 @@ def tally_neighbors(
         # min_distance = (
         #     (sum(val["distances"]) / count) / (max_distance if max_distance else epsilon)
         # )
-        min_distance = min(val["distances"]) / (
-            max_distance if max_distance else epsilon
-        )
+        # min_distance = min(val["distances"]) / (
+        #     max_distance if max_distance else epsilon
+        # )
+        min_distance = min(val["distances"])
         max_weight = max(val["weights"])
         avg_accuracy = sum(val["accuracies"]) / count
         penalty = 1.0
