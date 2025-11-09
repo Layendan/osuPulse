@@ -63,6 +63,8 @@
 			maxPp,
 			minHitLength,
 			maxHitLength,
+			minBpm,
+			maxBpm,
 			excludedMods,
 			includedMods
 		})
