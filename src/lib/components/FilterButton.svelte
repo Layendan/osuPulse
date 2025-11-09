@@ -341,8 +341,8 @@
 							maxHitLength = minHitLengthTemp
 								? Math.max(minHitLengthTemp, maxHitLengthTemp)
 								: maxHitLengthTemp;
-						if (minBpm) minBpm = maxBpm ? Math.min(minBpm, maxBpm) : minBpm;
-						if (maxBpm) maxBpm = minBpm ? Math.max(minBpm, maxBpm) : maxBpm;
+						if (minBpmTemp) minBpm = maxBpmTemp ? Math.min(minBpmTemp, maxBpmTemp) : minBpmTemp;
+						if (maxBpmTemp) maxBpm = minBpmTemp ? Math.max(minBpmTemp, maxBpmTemp) : maxBpmTemp;
 						excludedMods = excludedModsTemp;
 						includedMods = includedModsTemp;
 					}}
