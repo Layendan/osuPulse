@@ -50,6 +50,9 @@
 	let minHitLengthTemp: number | undefined = $state(minHitLength);
 	let maxHitLengthTemp: number | undefined = $state(maxHitLength);
 
+	let minBpmTemp: number | undefined = $state(minBpm);
+	let maxBpmTemp: number | undefined = $state(maxBpm);
+
 	let excludedModsTemp: number | undefined = $state(excludedMods);
 	let excludedEnumMods = $derived(excludedModsTemp ? getEnumMods(excludedModsTemp) : []);
 	let includedModsTemp: number | undefined = $state(includedMods);
@@ -92,6 +95,8 @@
 					maxPpTemp = maxPp;
 					minHitLengthTemp = minHitLength;
 					maxHitLengthTemp = maxHitLength;
+					minBpmTemp = minBpm;
+					maxBpmTemp = maxBpm;
 					excludedModsTemp = excludedMods;
 					includedModsTemp = includedMods;
 				}}
@@ -196,9 +201,9 @@
 				<input
 					type="number"
 					placeholder="minimum bpm"
-					bind:value={minBpm}
+					bind:value={minBpmTemp}
 					min="0"
-					max={maxBpm}
+					max={maxBpmTemp}
 					step="10"
 					class="input" />
 			</label>
@@ -208,8 +213,8 @@
 				<input
 					type="number"
 					placeholder="maximum bpm"
-					bind:value={maxBpm}
-					min={minBpm}
+					bind:value={maxBpmTemp}
+					min={minBpmTemp}
 					step="10"
 					class="input" />
 			</label>
@@ -336,6 +341,8 @@
 							maxHitLength = minHitLengthTemp
 								? Math.max(minHitLengthTemp, maxHitLengthTemp)
 								: maxHitLengthTemp;
+						if (minBpm) minBpm = maxBpm ? Math.min(minBpm, maxBpm) : minBpm;
+						if (maxBpm) maxBpm = minBpm ? Math.max(minBpm, maxBpm) : maxBpm;
 						excludedMods = excludedModsTemp;
 						includedMods = includedModsTemp;
 					}}
@@ -356,6 +363,8 @@
 				maxPpTemp = maxPp;
 				minHitLengthTemp = minHitLength;
 				maxHitLengthTemp = maxHitLength;
+				minBpmTemp = minBpm;
+				maxBpmTemp = maxBpm;
 				excludedModsTemp = excludedMods;
 				includedModsTemp = includedMods;
 			}}>close</button>
