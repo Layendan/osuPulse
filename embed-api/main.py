@@ -540,6 +540,7 @@ def find_similar_beatmaps_by_id(
             "Title",
             "Version",
             "Stars",
+            "PP",
             "Ranked",
         ],
     )
@@ -574,6 +575,7 @@ def find_similar_beatmaps_by_id(
             "Ranked": entity["Ranked"],
             "Distance": hit.distance,
             "Stars": neighbor_stars,
+            "PP": entity["PP"],
             "AccMult": acc_mult,
         }
         rows.append(row)
@@ -697,6 +699,8 @@ def tally_neighbors(
             "title": None,
             "version": None,
             "ranked": None,
+            "stars": None,
+            "pp": None,
         }
     )
     # max_distance = None
@@ -762,6 +766,10 @@ def tally_neighbors(
                 neighbor_info[key]["version"] = row["Version"]
             if neighbor_info[key]["ranked"] is None:
                 neighbor_info[key]["ranked"] = row["Ranked"]
+            if neighbor_info[key]["stars"] is None:
+                neighbor_info[key]["stars"] = row["Stars"]
+            if neighbor_info[key]["pp"] is None:
+                neighbor_info[key]["pp"] = row["PP"]
     epsilon = 1e-6
     summary = []
     beatmap_to_index = {
@@ -781,6 +789,8 @@ def tally_neighbors(
                 "BeatmapSetId": key[1],
                 "Mods": key[2],
                 "Ranked": val["ranked"],
+                "Stars": val["stars"],
+                "PP": val["pp"],
                 "Count": count,
                 "MinDistance": min_distance,
                 "MaxWeight": max_weight,

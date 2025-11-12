@@ -28,6 +28,8 @@ export type UserNeighbor = {
 	Title: string;
 	Version: string;
 	Score: number;
+	Stars: number;
+	PP: number;
 	Neighbors: NeighborInfo[];
 };
 
@@ -41,6 +43,8 @@ export type BeatmapNeighbor = {
 	Version: string;
 	Distance: number;
 	AccMult: number;
+	Stars: number;
+	PP: number;
 };
 
 export const ModsList = [ModsEnum.EZ, ModsEnum.HD, ModsEnum.HR, ModsEnum.DT, ModsEnum.HT];
