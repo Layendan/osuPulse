@@ -42,7 +42,7 @@
 
 	const query = $derived(
 		getUserPulseNeighbors({
-			userId: data.user?.id ?? 0,
+			userId: data.user.id,
 			showNsfw,
 			minStars,
 			maxStars,
