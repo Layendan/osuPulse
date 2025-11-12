@@ -42,7 +42,7 @@
 
 	const query = $derived(
 		getUserNeighbors({
-			userId: parseInt(page.params.userId ?? '0'),
+			userId: data.user?.id,
 			showNsfw,
 			minStars,
 			maxStars,
