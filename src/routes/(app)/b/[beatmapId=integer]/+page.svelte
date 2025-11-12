@@ -293,6 +293,7 @@
 								mods: data.mods,
 								title: data.beatmap.beatmapset.title,
 								version: data.beatmap.version,
+								ranked: data.beatmap.ranked,
 								distance: neighbor.Distance
 							}
 						]

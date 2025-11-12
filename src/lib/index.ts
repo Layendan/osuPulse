@@ -1,3 +1,4 @@
+import type { Beatmapset } from 'osu-api-v2-js';
 import type { Mod } from 'osu-web.js';
 
 import { ModsEnum } from 'osu-web.js';
@@ -10,6 +11,7 @@ export type NeighborInfo = {
 	mods: number;
 	title: string;
 	version: string;
+	ranked: Beatmapset.RankStatus;
 	distance: number;
 };
 
@@ -17,13 +19,14 @@ export type UserNeighbor = {
 	BeatmapId: number;
 	BeatmapSetId: number;
 	Mods: number;
+	Ranked: Beatmapset.RankStatus;
+	LastUpdated: Date;
 	Count: number;
-	AvgDistance: number;
-	AvgWeight: number;
+	MinDistance: number;
+	MaxWeight: number;
 	AvgAccuracy: number;
 	Title: string;
 	Version: string;
-	ZDistance: number;
 	Score: number;
 	Neighbors: NeighborInfo[];
 };
@@ -32,17 +35,12 @@ export type BeatmapNeighbor = {
 	BeatmapId: number;
 	BeatmapSetId: number;
 	Mods: number;
+	Ranked: Beatmapset.RankStatus;
+	LastUpdated: Date;
 	Title: string;
 	Version: string;
 	Distance: number;
 	AccMult: number;
-	Stamina: number;
-	Streams: number;
-	Aim: number;
-	Accuracy: number;
-	Precision: number;
-	Reaction: number;
-	Flashlight: number;
 };
 
 export const ModsList = [ModsEnum.EZ, ModsEnum.HD, ModsEnum.HR, ModsEnum.DT, ModsEnum.HT];

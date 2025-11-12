@@ -10,7 +10,7 @@
 </script>
 
 <div
-	class="mask mask-hexagon-2 grid aspect-square size-10 items-center justify-center {isModDifficultyIncrease
+	class="mask mask-hexagon-2 grid aspect-square size-8 items-center justify-center md:size-10 {isModDifficultyIncrease
 		? 'bg-[#ff6666]'
 		: 'bg-[#b3ff66]'}"
 	{...props}>

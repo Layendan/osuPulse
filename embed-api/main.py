@@ -501,6 +501,7 @@ def find_similar_beatmaps_by_id(
             "Mods",
             "BeatmapSetId",
             "Stars",
+            "Ranked",
         ],
         limit=1,
     )
@@ -540,6 +541,7 @@ def find_similar_beatmaps_by_id(
             "Title",
             "Version",
             "Stars",
+            "Ranked",
         ],
     )
     if not search_results or len(search_results[0]) <= 1:
@@ -570,6 +572,7 @@ def find_similar_beatmaps_by_id(
             "Mods": entity["Mods"],
             "Title": entity["Title"],
             "Version": entity["Version"],
+            "Ranked": entity["Ranked"],
             "Distance": hit.distance,
             "Stars": neighbor_stars,
             "AccMult": acc_mult,
@@ -589,11 +592,19 @@ async def get_user_top_scores(client: aiosu.v2.Client, user_id: int, n_scores=50
     result = []
     for score in best_scores:
         beatmap = score.beatmap
+        beatmapset = score.beatmapset
         mods_short = [m.acronym.lower() for m in (score.mods or [])]
         result.append(
             {
-                "beatmap": {"id": beatmap.id if beatmap else None},
-                "beatmapset": {"id": beatmap.beatmapset_id if beatmap else None},
+                "beatmap": {
+                    "id": beatmap.id,
+                    "version": beatmap.version,
+                    "status": beatmap.status,
+                },
+                "beatmapset": {
+                    "id": beatmapset.id,
+                    "title": beatmapset.title,
+                },
                 "mods": mods_short,
                 "accuracy": score.accuracy,
             }
@@ -605,16 +616,23 @@ async def get_user_recent_scores(
     client: aiosu.v2.Client, user_id: int, n_scores: int = 50
 ):
     """Returns recent user std scores"""
-    best_scores = await client.get_user_recents(
+    recent_scores = await client.get_user_recents(
         user_id=user_id,
         mode=aiosu.models.gamemode.Gamemode.STANDARD,
         limit=n_scores,
         new_format=True,
     )
     seen = {}
-    accuracy_bucket = defaultdict(list)
+    accuracy_bucket = defaultdict(
+        lambda: {
+            "accuracies": [],
+            "title": None,
+            "version": None,
+            "status": None,
+        }
+    )
     key_order = []
-    for score in best_scores:
+    for score in recent_scores:
         if (
             score.beatmap.status == aiosu.models.BeatmapRankStatus.RANKED
             and score.pp is not None
@@ -623,18 +641,30 @@ async def get_user_recent_scores(
             beatmapset_id = score.beatmap.beatmapset_id if score.beatmap else None
             mods = tuple(sorted([m.acronym.lower() for m in (score.mods or [])]))
             key = (beatmap_id, beatmapset_id, mods)
-            accuracy_bucket[key].append(score.accuracy)
+            accuracy_bucket[key]["accuracies"].append(score.accuracy)
+            accuracy_bucket[key]["title"] = score.beatmapset.title
+            accuracy_bucket[key]["version"] = score.beatmap.version
+            accuracy_bucket[key]["status"] = score.beatmap.status
             if key not in seen:
                 seen[key] = (beatmap_id, mods)
                 key_order.append(key)
     result = []
     for key in key_order:
         beatmap_id, beatmapset_id, mods = key
-        avg_accuracy = sum(accuracy_bucket[key]) / len(accuracy_bucket[key])
+        avg_accuracy = sum(accuracy_bucket[key]["accuracies"]) / len(
+            accuracy_bucket[key]["accuracies"]
+        )
         result.append(
             {
-                "beatmap": {"id": beatmap_id},
-                "beatmapset": {"id": beatmapset_id},
+                "beatmap": {
+                    "id": beatmap_id,
+                    "version": accuracy_bucket[key]["version"],
+                    "status": accuracy_bucket[key]["status"],
+                },
+                "beatmapset": {
+                    "id": beatmapset_id,
+                    "title": accuracy_bucket[key]["title"],
+                },
                 "mods": list(mods),
                 "accuracy": avg_accuracy,
             }
@@ -644,7 +674,7 @@ async def get_user_recent_scores(
 
 def tally_neighbors(
     client: MilvusClient,
-    user_scores: list,
+    user_scores: list[aiosu.models.beatmap.Beatmap],
     top_n_neighbors=50,
     show_nsfw: bool = True,
     min_stars: float | None = None,
@@ -667,6 +697,7 @@ def tally_neighbors(
             "accuracies": [],
             "title": None,
             "version": None,
+            "ranked": None,
         }
     )
     # max_distance = None
@@ -710,6 +741,9 @@ def tally_neighbors(
                     "beatmapset_id": score["beatmapset"]["id"],
                     "mods": mod,
                     "distance": row["Distance"],
+                    "title": score["beatmapset"]["title"],
+                    "version": score["beatmap"]["version"],
+                    "ranked": score["beatmap"]["status"],
                 }
             )
             neighbor_info[key]["weights"].append(user_weight)
@@ -727,8 +761,8 @@ def tally_neighbors(
                 neighbor_info[key]["title"] = row["Title"]
             if neighbor_info[key]["version"] is None:
                 neighbor_info[key]["version"] = row["Version"]
-            # if max_distance is None or row["Distance"] > max_distance:
-            #     max_distance = row["Distance"]
+            if neighbor_info[key]["ranked"] is None:
+                neighbor_info[key]["ranked"] = row["Ranked"]
     epsilon = 1e-6
     summary = []
     beatmap_to_index = {
@@ -736,12 +770,6 @@ def tally_neighbors(
     }
     for key, val in neighbor_info.items():
         count = len(val["distances"])
-        # min_distance = (
-        #     (sum(val["distances"]) / count) / (max_distance if max_distance else epsilon)
-        # )
-        # min_distance = min(val["distances"]) / (
-        #     max_distance if max_distance else epsilon
-        # )
         min_distance = min(val["distances"])
         max_weight = max(val["weights"])
         avg_accuracy = sum(val["accuracies"]) / count
@@ -753,6 +781,7 @@ def tally_neighbors(
                 "BeatmapId": key[0],
                 "BeatmapSetId": key[1],
                 "Mods": key[2],
+                "Ranked": val["ranked"],
                 "Count": count,
                 "MinDistance": min_distance,
                 "MaxWeight": max_weight,
@@ -761,23 +790,16 @@ def tally_neighbors(
                 "Version": val["version"],
                 "Neighbors": val["neighbors"],
                 "Penalty": penalty,
+                "Score": (
+                    (((0.1 * log2(count + 1)) + 0.9) * ((2 ** (max_weight**4)) - 1))
+                    / (min_distance + epsilon)
+                    * penalty
+                ),
             }
         )
     if not summary:
         return []
-    # distances = np.exp(-((np.array([entry["MinDistance"] for entry in summary])) ** 2))
-    for i, entry in enumerate(summary):
-        count = entry["Count"]
-        min_distance = entry["MinDistance"]
-        max_weight = entry["MaxWeight"]
-        penalty = entry["Penalty"]
-        # entry["ZDistance"] = distances[i]
-        entry["Score"] = (
-            (((0.1 * log2(count + 1)) + 0.9) * ((2 ** (max_weight**4)) - 1))
-            / (min_distance + epsilon)
-            # * distances[i]
-            * penalty
-        )
+
     summary_sorted = sorted(summary, key=lambda x: -x["Score"])
     return summary_sorted[:top_n_neighbors]
 

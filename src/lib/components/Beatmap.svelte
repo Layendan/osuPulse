@@ -3,8 +3,9 @@
 	import type { Attachment } from 'svelte/attachments';
 	import type { Props } from 'tippy.js';
 
-	import { faFileArrowDown } from '@fortawesome/free-solid-svg-icons';
+	import { faCopy, faFileArrowDown, faStar } from '@fortawesome/free-solid-svg-icons';
 	import { resolve } from '$app/paths';
+	import { Beatmapset } from 'osu-api-v2-js';
 	import { buildUrl, getEnumMods } from 'osu-web.js';
 	import Fa from 'svelte-fa';
 	import { quintOut } from 'svelte/easing';
@@ -20,15 +21,16 @@
 	}: {
 		neighbor: Pick<
 			UserNeighbor,
-			'BeatmapSetId' | 'BeatmapId' | 'Mods' | 'Title' | 'Version' | 'Neighbors'
+			'BeatmapSetId' | 'BeatmapId' | 'Mods' | 'Title' | 'Version' | 'Neighbors' | 'Ranked'
 		> &
-			Partial<Pick<UserNeighbor, 'AvgAccuracy' | 'Score'>>;
+			Partial<Pick<UserNeighbor, 'AvgAccuracy' | 'Score' | 'LastUpdated'>>;
 		rank: number;
 		isDetailed?: boolean;
 	} = $props();
 
 	const tweenParams = { easing: quintOut, duration: 2000 };
 	const score = Tween.of(() => neighbor.Score, tweenParams);
+	const { text: badgeText, style: badgeStyle } = getBadgeData(neighbor.Ranked);
 
 	function tooltip(content: string, props?: Partial<Props>): Attachment {
 		return (element) => {
@@ -37,12 +39,34 @@
 			return () => tooltip.destroy();
 		};
 	}
+
+	function getBadgeData(ranked: Beatmapset.RankStatus) {
+		switch (ranked) {
+			case Beatmapset.RankStatus.Ranked:
+				return {
+					style: `--badge-bg: hsl(90,100%,70%); --badge-fg: hsl(200,10%,25%);`,
+					text: 'Ranked'
+				};
+
+			case Beatmapset.RankStatus.Loved:
+				return {
+					style: `--badge-bg: hsl(333,100%,70%); --badge-fg: hsl(200,10%,25%);`,
+					text: 'Loved'
+				};
+
+			default:
+				return {
+					style: `--badge-bg: hsl(0,25%,65%); --badge-fg: hsl(200,10%,25%);`,
+					text: 'Unknown'
+				};
+		}
+	}
 </script>
 
 <div
 	class="group ring-primary bg-base-300 relative grid h-full grid-cols-1 overflow-clip rounded-xl transition-all duration-200 focus-within:ring-2">
 	<div
-		class="relative inline-flex h-20 w-full flex-row overflow-clip rounded-xl"
+		class="relative inline-flex h-20 w-full flex-row overflow-clip rounded-xl sm:h-28"
 		class:rounded-b-none={isDetailed}>
 		<img
 			src={buildUrl.beatmapsetCover(neighbor.BeatmapSetId)}
@@ -63,17 +87,34 @@
 					#{rank}
 				</p>
 			</div>
-			<span class="flex w-full items-center justify-between pr-4">
-				<div class="inline-flex flex-col px-4">
-					<h1 class="line-clamp-1 text-xl font-bold break-all md:text-2xl">{neighbor.Title}</h1>
-					<h2 class="line-clamp-1 text-xl font-light break-all">[{neighbor.Version}]</h2>
+			<span class="flex h-full w-full items-center justify-between gap-0 pr-4 sm:gap-4">
+				<div class="inline-flex flex-col justify-around gap-2 px-4">
+					<div class="inline-flex flex-col">
+						<h1 class="line-clamp-1 text-base font-bold break-all sm:text-2xl">{neighbor.Title}</h1>
+						<h2 class="line-clamp-1 text-sm font-light break-all sm:text-lg">
+							[{neighbor.Version}]
+						</h2>
+					</div>
+					<div class="inline-flex flex-row gap-2">
+						<div class="badge badge-sm font-bold uppercase" style={badgeStyle}>
+							{badgeText}
+						</div>
+						{#if neighbor.LastUpdated && (neighbor.LastUpdated.getTime() - Date.now()) / (1000 * 3600 * 24) <= 30}
+							<div class="badge-sm sm:badge badge-primary hidden font-bold uppercase">
+								<Fa icon={faStar} />
+								New
+							</div>
+						{/if}
+					</div>
 				</div>
-				<ul class="inline-flex flex-row items-center gap-1">
-					{#each getEnumMods(neighbor.Mods) as mod (mod)}
-						<li>
-							<Mod {mod} {@attach tooltip(mod)} />
-						</li>
-					{/each}
+				<div class="inline-flex flex-row items-center gap-1">
+					<ul class="inline-flex flex-row-reverse sm:gap-1">
+						{#each getEnumMods(neighbor.Mods).reverse() as mod (mod)}
+							<li class="max-sm:not-first:-mr-3">
+								<Mod {mod} {@attach tooltip(mod)} />
+							</li>
+						{/each}
+					</ul>
 
 					{#if neighbor.AvgAccuracy}
 						<p class="ml-3 text-right text-xl font-light">
@@ -81,11 +122,11 @@
 							{(neighbor.AvgAccuracy * 100).toFixed(2)}%
 						</p>
 					{/if}
-				</ul>
+				</div>
 			</span>
 		</a>
 		<div
-			class="bg-base-300 z-10 flex w-0 items-center justify-center rounded-xl transition-[width] duration-200 group-focus-within:w-14 group-hover:w-14 md:w-4"
+			class="bg-base-300 z-10 grid w-0 grid-rows-2 items-center justify-center rounded-xl py-2 transition-[width] duration-200 group-focus-within:w-14 group-hover:w-14 sm:w-4"
 			class:rounded-b-none={isDetailed}>
 			<a
 				href="osu://b/{neighbor.BeatmapId}"
@@ -93,6 +134,12 @@
 				{@attach tooltip('open in osu!direct')}>
 				<Fa icon={faFileArrowDown} />
 			</a>
+			<button
+				onclick={() => navigator.clipboard.writeText(neighbor.BeatmapId.toString())}
+				class="cursor-pointer opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100"
+				{@attach tooltip('copy beatmap id')}>
+				<Fa icon={faCopy} />
+			</button>
 		</div>
 	</div>
 	{#if isDetailed}

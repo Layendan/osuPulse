@@ -65,7 +65,10 @@ export const getBeatmapNeighbors = query(
 			}
 		});
 
-		if (!response.ok) error(404, 'Not found');
+		if (!response.ok) {
+			console.error(response.status, await response.text());
+			error(response.status, response.statusText);
+		}
 
 		const neighbors: NeighborResponse = await response.json();
 
