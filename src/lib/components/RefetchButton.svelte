@@ -9,7 +9,7 @@
 
 	let { queryFunction }: { queryFunction: RemoteQuery<unknown> } = $props();
 
-	const loading = $derived($state.eager(queryFunction.loading));
+	const loading = $derived(queryFunction.loading);
 
 	function tooltip(
 		content: string,
