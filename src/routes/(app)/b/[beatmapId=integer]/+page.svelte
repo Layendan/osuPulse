@@ -10,6 +10,7 @@
 	import FilterButton from '$lib/components/FilterButton.svelte';
 	import Header from '$lib/components/Header.svelte';
 	import Mod from '$lib/components/Mod.svelte';
+	import RefetchButton from '$lib/components/RefetchButton.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import UserSearch from '$lib/components/UserSearch.svelte';
 	import { faFileArrowDown, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
@@ -54,8 +55,8 @@
 
 	const query = $derived(
 		getBeatmapNeighbors({
-			beatmapId: data.beatmap.id,
-			mods,
+			beatmapId: parseInt(page.params.beatmapId ?? '0'),
+			mods: parseInt(page.url.searchParams.get('mods') ?? '0'),
 			showNsfw,
 			minStars,
 			maxStars,
@@ -145,7 +146,7 @@
 					download beatmap
 				</a>
 				<ShareButton {url} />
-				<!-- <RefetchButton queryFunction={query} /> -->
+				<RefetchButton queryFunction={query} />
 				<FilterButton
 					bind:showNsfw
 					bind:minStars

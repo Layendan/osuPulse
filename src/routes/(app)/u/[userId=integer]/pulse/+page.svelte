@@ -8,9 +8,11 @@
 	import BeatmapSearch from '$lib/components/BeatmapSearch.svelte';
 	import FilterButton from '$lib/components/FilterButton.svelte';
 	import Header from '$lib/components/Header.svelte';
+	import RefetchButton from '$lib/components/RefetchButton.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import UserSearch from '$lib/components/UserSearch.svelte';
 	import { faInfoCircle, faUser } from '@fortawesome/free-solid-svg-icons';
+	import { page } from '$app/state';
 	import Fa from 'svelte-fa';
 	import { flip } from 'svelte/animate';
 	import { fade } from 'svelte/transition';
@@ -40,7 +42,7 @@
 
 	const query = $derived(
 		getUserPulseNeighbors({
-			userId: data.user.id,
+			userId: parseInt(page.params.userId ?? '0'),
 			showNsfw,
 			minStars,
 			maxStars,
@@ -115,7 +117,7 @@
 					{data.user.username}'s profile
 				</a>
 				<ShareButton />
-				<!-- <RefetchButton queryFunction={query} /> -->
+				<RefetchButton queryFunction={query} />
 				<FilterButton
 					bind:showNsfw
 					bind:minStars
