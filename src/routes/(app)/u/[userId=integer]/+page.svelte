@@ -7,10 +7,10 @@
 	import BeatmapDetailToggle from '$lib/components/BeatmapDetailToggle.svelte';
 	import BeatmapSearch from '$lib/components/BeatmapSearch.svelte';
 	import FilterButton from '$lib/components/FilterButton.svelte';
+	import Header from '$lib/components/Header.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import UserSearch from '$lib/components/UserSearch.svelte';
 	import { faInfoCircle, faWater } from '@fortawesome/free-solid-svg-icons';
-	import { buildUrl } from 'osu-web.js';
 	import Fa from 'svelte-fa';
 	import { flip } from 'svelte/animate';
 	import { fade } from 'svelte/transition';
@@ -18,10 +18,6 @@
 	import { getUserNeighbors } from './data.remote';
 
 	let { data }: PageProps = $props();
-
-	const globalRank = $derived(data.user.statistics.global_rank);
-	const countryRank = $derived(data.user.statistics.country_rank);
-	const pp = $derived(data.user.statistics.pp);
 
 	let showNsfw: boolean = $state(true);
 
@@ -92,49 +88,7 @@
 </svelte:head>
 
 <div class="bg-base-200 container mx-auto gap-2 overflow-clip rounded-xl" id="main">
-	<a
-		href={buildUrl.user(data.user.id)}
-		target="_blank"
-		rel="noopener noreferrer"
-		class="relative grid w-full place-items-center px-4">
-		<img
-			src={data.user.cover.custom_url ?? data.user.cover.url}
-			class="absolute h-full w-full object-cover"
-			alt="user cover"
-			fetchpriority="high" />
-		<div class="bg-base-100/80 absolute h-full w-full backdrop-blur-xs"></div>
-		<div class="z-10 my-2 inline-flex items-center gap-4">
-			<img
-				src={data.user.avatar_url}
-				class="aspect-square size-20 rounded-2xl md:size-32 md:rounded-4xl"
-				alt="user avatar" />
-			<div class="inline-flex flex-col gap-2">
-				<h1 class="text-3xl font-bold md:text-5xl">{data.user.username}</h1>
-				<span class="inline-flex gap-4">
-					<h2 class="text-3xl font-light">
-						<legend class="text-xs">Global Ranking</legend>
-						{#if globalRank}
-							#{new Intl.NumberFormat().format(globalRank)}
-						{:else}
-							-
-						{/if}
-					</h2>
-					<h2 class="text-3xl font-light max-md:hidden">
-						<legend class="text-xs">Country Ranking</legend>
-						{#if countryRank}
-							#{new Intl.NumberFormat().format(countryRank)}
-						{:else}
-							-
-						{/if}
-					</h2>
-					<h2 class="text-3xl font-light max-sm:hidden">
-						<legend class="text-xs">Performance Points</legend>
-						{new Intl.NumberFormat().format(parseInt((pp ?? 0).toFixed(0)))}pp
-					</h2>
-				</span>
-			</div>
-		</div>
-	</a>
+	<Header data={data.user} />
 
 	<div class="bg-base-300 grid grid-cols-1 items-center gap-4 p-4 2xl:grid-cols-2">
 		<div class="flex flex-col justify-around gap-2 text-center 2xl:justify-self-end">

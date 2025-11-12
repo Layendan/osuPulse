@@ -8,12 +8,13 @@
 	import BeatmapDetailToggle from '$lib/components/BeatmapDetailToggle.svelte';
 	import BeatmapSearch from '$lib/components/BeatmapSearch.svelte';
 	import FilterButton from '$lib/components/FilterButton.svelte';
+	import Header from '$lib/components/Header.svelte';
 	import Mod from '$lib/components/Mod.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import UserSearch from '$lib/components/UserSearch.svelte';
-	import { faFileArrowDown, faInfoCircle, faStar } from '@fortawesome/free-solid-svg-icons';
+	import { faFileArrowDown, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 	import { page } from '$app/state';
-	import { buildUrl, getEnumMods, getModsEnum } from 'osu-web.js';
+	import { getEnumMods, getModsEnum } from 'osu-web.js';
 	import Fa from 'svelte-fa';
 	import { flip } from 'svelte/animate';
 	import { fade } from 'svelte/transition';
@@ -118,45 +119,7 @@
 </svelte:head>
 
 <div class="bg-base-200 container mx-auto gap-2 overflow-clip rounded-xl" id="main">
-	<a
-		href={buildUrl.beatmap(data.beatmap.id)}
-		target="_blank"
-		rel="noopener noreferrer"
-		class="relative grid w-full place-items-center px-4">
-		<img
-			src={data.beatmap.beatmapset.covers['cover@2x']}
-			class="absolute h-full w-full object-cover"
-			alt="beatmap cover"
-			fetchpriority="high" />
-		<div class="bg-base-100/80 absolute h-full w-full backdrop-blur-xs"></div>
-		<div class="z-10 my-2 inline-flex items-center gap-4">
-			<img
-				src={data.beatmap.beatmapset.covers['card@2x']}
-				class="aspect-square size-20 rounded-2xl object-cover md:size-32 md:rounded-4xl"
-				alt="beatmap card" />
-			<div class="inline-flex flex-col gap-2">
-				<span class="inline-flex flex-col gap-0">
-					<h1 class="text-3xl font-bold md:text-5xl">{data.beatmap.beatmapset.title}</h1>
-					<h2 class="text-xl font-light md:text-2xl">[{data.beatmap.version}]</h2>
-				</span>
-				<span class="inline-flex gap-4">
-					<h2 class="text-3xl font-light">
-						<legend class="text-xs">Star Rating</legend>
-						<span class="inline-flex flex-row items-center gap-1">
-							{new Intl.NumberFormat().format(data.beatmap.difficulty_rating)}
-							<Fa icon={faStar} class="text-xl" />
-						</span>
-					</h2>
-					{#if data.beatmap.bpm}
-						<h2 class="text-3xl font-light">
-							<legend class="text-xs">Beats Per Minute</legend>
-							{new Intl.NumberFormat().format(data.beatmap.bpm)}bpm
-						</h2>
-					{/if}
-				</span>
-			</div>
-		</div>
-	</a>
+	<Header data={data.beatmap} />
 
 	<div class="bg-base-300 grid grid-cols-1 items-center gap-4 p-4 2xl:grid-cols-2">
 		<div class="flex flex-col justify-around gap-2 text-center 2xl:justify-self-end">
