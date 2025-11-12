@@ -9,7 +9,6 @@
 	import BeatmapSearch from '$lib/components/BeatmapSearch.svelte';
 	import FilterButton from '$lib/components/FilterButton.svelte';
 	import Mod from '$lib/components/Mod.svelte';
-	import RefetchButton from '$lib/components/RefetchButton.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import UserSearch from '$lib/components/UserSearch.svelte';
 	import { faFileArrowDown, faInfoCircle, faStar } from '@fortawesome/free-solid-svg-icons';
@@ -183,7 +182,7 @@
 					download beatmap
 				</a>
 				<ShareButton {url} />
-				<RefetchButton queryFunction={query} />
+				<!-- <RefetchButton queryFunction={query} /> -->
 				<FilterButton
 					bind:showNsfw
 					bind:minStars
