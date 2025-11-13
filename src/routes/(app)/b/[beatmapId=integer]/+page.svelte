@@ -120,7 +120,7 @@
 </svelte:head>
 
 <div class="bg-base-200 container mx-auto gap-2 overflow-clip rounded-xl" id="main">
-	<Header data={data.beatmap} />
+	<Header data={$state.eager(data.beatmap)} />
 
 	<div class="bg-base-300 grid grid-cols-1 items-center gap-4 p-4 2xl:grid-cols-2">
 		<div class="flex flex-col justify-around gap-2 text-center 2xl:justify-self-end">
