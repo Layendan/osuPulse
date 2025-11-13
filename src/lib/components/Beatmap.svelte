@@ -195,18 +195,18 @@
 		<div
 			class="bg-base-300 z-10 grid w-0 grid-rows-2 items-center justify-center rounded-xl py-2 transition-[width] duration-200 group-focus-within:w-14 group-hover:w-14 sm:w-4"
 			class:rounded-b-none={isDetailed}>
-			<a
-				href="osu://b/{neighbor.BeatmapId}"
-				class="opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100"
-				{@attach tooltip('open in osu!direct')}>
-				<Fa icon={faFileArrowDown} />
-			</a>
 			<button
 				onclick={() => navigator.clipboard.writeText(neighbor.BeatmapId.toString())}
 				class="cursor-pointer opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100"
 				{@attach tooltip('copy beatmap id')}>
 				<Fa icon={faCopy} />
 			</button>
+			<a
+				href="osu://b/{neighbor.BeatmapId}"
+				class="opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100"
+				{@attach tooltip('open in osu!direct')}>
+				<Fa icon={faFileArrowDown} />
+			</a>
 		</div>
 	</div>
 	{#if isDetailed}
