@@ -146,7 +146,10 @@
 							class="badge badge-sm gap-1 font-bold uppercase"
 							style="--badge-bg: {starBg}; --badge-fg: {starFg}">
 							<Fa icon={faStar} />
-							{neighbor.Stars.toFixed(2)}
+							{new Intl.NumberFormat(undefined, {
+								minimumFractionDigits: 2,
+								maximumFractionDigits: 2
+							}).format(neighbor.Stars)}
 						</div>
 						{#if neighbor.LastUpdated && (neighbor.LastUpdated.getTime() - Date.now()) / (1000 * 3600 * 24) <= 30}
 							<div class="badge-sm sm:badge badge-primary hidden font-bold uppercase">
@@ -172,12 +175,18 @@
 						{#if neighbor.AvgAccuracy}
 							<p class="text-right text-lg font-light">
 								<legend class="text-xs">Exp.&nbsp;Accuracy</legend>
-								{(neighbor.AvgAccuracy * 100).toFixed(2)}%
+								{new Intl.NumberFormat(undefined, {
+									style: 'percent',
+									minimumFractionDigits: 2,
+									maximumFractionDigits: 2
+								}).format(neighbor.AvgAccuracy)}
 							</p>
 						{/if}
 						<p class="text-right text-lg font-light">
 							<legend class="text-xs">Maximum&nbsp;PP</legend>
-							{neighbor.PP.toFixed(0)}pp
+							{new Intl.NumberFormat(undefined, {
+								maximumFractionDigits: 0
+							}).format(neighbor.PP)}pp
 						</p>
 					</div>
 				</div>
@@ -205,7 +214,10 @@
 			{#if score.current}
 				<span class="mb-4 inline-flex w-full justify-center">
 					<h2 class="font-semibold">pulse score:</h2>
-					&nbsp;{score.current.toFixed(2)} points
+					&nbsp;{new Intl.NumberFormat(undefined, {
+						minimumFractionDigits: 2,
+						maximumFractionDigits: 2
+					}).format(score.current)} points
 				</span>
 			{/if}
 			<ul class="flex flex-col gap-4">
@@ -229,7 +241,10 @@
 							</div>
 							<p class="ml-3 text-right text-base font-light">
 								<legend class="text-xs">Similarity</legend>
-								{neighborInfo.distance.toFixed(2)}
+								{new Intl.NumberFormat(undefined, {
+									minimumFractionDigits: 2,
+									maximumFractionDigits: 2
+								}).format(neighborInfo.distance)}
 							</p>
 						</a>
 					</li>

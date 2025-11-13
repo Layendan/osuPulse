@@ -3,6 +3,7 @@
 	import type { Props } from 'tippy.js';
 
 	import icon from '$lib/assets/icon.png?enhanced';
+	import OsuLogo from '$lib/components/OsuLogo.svelte';
 	import { faDiscord, faGithub } from '@fortawesome/free-brands-svg-icons';
 	import { resolve } from '$app/paths';
 	import Fa from 'svelte-fa';
@@ -45,7 +46,7 @@
 			<a
 				href="https://discord.gg/smyaYEM7V4"
 				target="_blank"
-				rel="noopener noreferrer"
+				rel="noopener noreferrer external"
 				class="text-2xl"
 				{@attach tooltip('discord')}>
 				<Fa icon={faDiscord} />
@@ -53,10 +54,18 @@
 			<a
 				href="https://github.com/Layendan/OsuPulse"
 				target="_blank"
-				rel="noopener noreferrer"
+				rel="noopener noreferrer external"
 				class="text-2xl"
 				{@attach tooltip('github')}>
 				<Fa icon={faGithub} />
+			</a>
+			<a
+				href="https://osu.ppy.sh/users/13263918"
+				target="_blank"
+				rel="noopener noreferrer external"
+				class="size-6"
+				{@attach tooltip('osu!')}>
+				<OsuLogo />
 			</a>
 		</div>
 	</nav>

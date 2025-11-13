@@ -107,7 +107,7 @@
 				<a
 					href="https://discord.gg/smyaYEM7V4"
 					target="_blank"
-					rel="noopener noreferrer"
+					rel="noopener noreferrer external"
 					class="text-2xl"
 					{@attach tooltip('discord')}>
 					<Fa icon={faDiscord} />
@@ -115,7 +115,7 @@
 				<a
 					href="https://github.com/Layendan/osuPulse"
 					target="_blank"
-					rel="noopener noreferrer"
+					rel="noopener noreferrer external"
 					class="text-2xl"
 					{@attach tooltip('github')}>
 					<Fa icon={faGithub} />
@@ -123,7 +123,7 @@
 				<a
 					href="https://osu.ppy.sh/users/13263918"
 					target="_blank"
-					rel="noopener noreferrer"
+					rel="noopener noreferrer external"
 					class="size-6"
 					{@attach tooltip('osu!')}>
 					<OsuLogo />

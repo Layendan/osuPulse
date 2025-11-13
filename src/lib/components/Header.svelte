@@ -8,8 +8,10 @@
 	let { data }: { data: Beatmap.Extended.WithFailtimesOwnersMaxcomboBeatmapset | User.Extended } =
 		$props();
 
-	function isBeatmap(data: any): data is Beatmap.Extended.WithFailtimesOwnersMaxcomboBeatmapset {
-		return !!data.beatmapset;
+	function isBeatmap(
+		data: unknown
+	): data is Beatmap.Extended.WithFailtimesOwnersMaxcomboBeatmapset {
+		return typeof data === 'object' && data !== null && 'beatmapset' in data;
 	}
 </script>
 
@@ -17,7 +19,7 @@
 	<a
 		href={buildUrl.beatmap(data.id)}
 		target="_blank"
-		rel="noopener noreferrer"
+		rel="noopener noreferrer external"
 		class="relative grid w-full place-items-center px-4">
 		<img
 			src={data.beatmapset.covers['cover@2x']}
@@ -40,7 +42,10 @@
 						<legend class="text-xs">Star Rating</legend>
 						<span class="inline-flex flex-row items-center gap-1">
 							<Fa icon={faStar} class="text-xl" />
-							{new Intl.NumberFormat().format(data.difficulty_rating)}
+							{new Intl.NumberFormat(undefined, {
+								minimumFractionDigits: 2,
+								maximumFractionDigits: 2
+							}).format(data.difficulty_rating)}
 						</span>
 					</h2>
 					{#if data.bpm}
@@ -61,7 +66,7 @@
 	<a
 		href={buildUrl.user(data.id)}
 		target="_blank"
-		rel="noopener noreferrer"
+		rel="noopener noreferrer external"
 		class="relative grid w-full place-items-center px-4">
 		<img
 			src={data.cover.custom_url ?? data.cover.url}
@@ -95,7 +100,11 @@
 					</h2>
 					<h2 class="text-3xl font-light max-sm:hidden">
 						<legend class="text-xs">Performance Points</legend>
-						{new Intl.NumberFormat().format(parseInt((pp ?? 0).toFixed(0)))}pp
+						{#if pp}
+							{new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(pp)}pp
+						{:else}
+							-
+						{/if}
 					</h2>
 				</span>
 			</div>
