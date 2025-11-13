@@ -173,8 +173,7 @@
 
 					<div class="hidden flex-col justify-center gap-2 sm:ml-3 sm:flex">
 						{#if neighbor.AvgAccuracy}
-							<!-- text-align-last safari bug fix: https://bugs.webkit.org/show_bug.cgi?id=40216 -->
-							<p class="text-right text-lg font-light [text-align-last:center]">
+							<p class="inline-flex flex-col text-right text-lg font-light">
 								<legend class="text-xs">Exp.&nbsp;Accuracy</legend>
 								{new Intl.NumberFormat(undefined, {
 									style: 'percent',
@@ -183,7 +182,7 @@
 								}).format(neighbor.AvgAccuracy)}
 							</p>
 						{/if}
-						<p class="text-right text-lg font-light">
+						<p class="inline-flex flex-col text-right text-lg font-light">
 							<legend class="text-xs">Maximum&nbsp;PP</legend>
 							{new Intl.NumberFormat(undefined, {
 								maximumFractionDigits: 0
@@ -240,8 +239,7 @@
 									[{neighborInfo.version}]
 								</h2>
 							</div>
-							<!-- text-align-last safari bug fix: https://bugs.webkit.org/show_bug.cgi?id=40216 -->
-							<p class="ml-3 text-right text-base font-light [text-align-last:center]">
+							<p class="ml-3 inline-flex flex-col text-right text-base font-light">
 								<legend class="text-xs">Similarity</legend>
 								{new Intl.NumberFormat(undefined, {
 									minimumFractionDigits: 2,
