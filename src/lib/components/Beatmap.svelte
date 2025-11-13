@@ -161,7 +161,7 @@
 				</div>
 				<div class="inline-flex flex-row items-center gap-1">
 					<ul
-						class="grid place-items-center gap-x-1 gap-y-0.5"
+						class="grid w-max place-items-center gap-x-1 gap-y-0.5"
 						class:grid-rows-2={mods.length >= 2}
 						class:grid-cols-2={mods.length >= 3}>
 						{#each mods as mod, i (mod)}
@@ -173,7 +173,8 @@
 
 					<div class="hidden flex-col justify-center gap-2 sm:ml-3 sm:flex">
 						{#if neighbor.AvgAccuracy}
-							<p class="text-right text-lg font-light">
+							<!-- text-align-last safari bug fix: https://bugs.webkit.org/show_bug.cgi?id=40216 -->
+							<p class="text-right text-lg font-light [text-align-last:center]">
 								<legend class="text-xs">Exp.&nbsp;Accuracy</legend>
 								{new Intl.NumberFormat(undefined, {
 									style: 'percent',
@@ -239,7 +240,8 @@
 									[{neighborInfo.version}]
 								</h2>
 							</div>
-							<p class="ml-3 text-right text-base font-light">
+							<!-- text-align-last safari bug fix: https://bugs.webkit.org/show_bug.cgi?id=40216 -->
+							<p class="ml-3 text-right text-base font-light [text-align-last:center]">
 								<legend class="text-xs">Similarity</legend>
 								{new Intl.NumberFormat(undefined, {
 									minimumFractionDigits: 2,
