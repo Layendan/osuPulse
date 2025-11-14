@@ -27,7 +27,7 @@
 			alt="beatmap cover"
 			fetchpriority="high" />
 		<div class="bg-base-100/80 absolute h-full w-full backdrop-blur-xs"></div>
-		<div class="z-10 my-2 inline-flex items-center gap-4">
+		<div class="z-10 my-2 inline-flex items-center gap-4 sm:max-w-10/12 lg:max-w-4/5 xl:max-w-3/5">
 			<img
 				src={data.beatmapset.covers['card@2x']}
 				class="aspect-square size-20 rounded-2xl object-cover md:size-32 md:rounded-4xl"

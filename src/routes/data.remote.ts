@@ -1,10 +1,10 @@
-import type { User } from 'osu-api-v2-js';
+import type { APIError, User } from 'osu-api-v2-js';
 
 import { api } from '$lib/server';
 import { error, redirect } from '@sveltejs/kit';
 import { form } from '$app/server';
 import { Ruleset } from 'osu-api-v2-js';
-import { nonEmpty, object, pipe, string, url } from 'valibot';
+import { integer, nonEmpty, number, object, pipe, string, union, url } from 'valibot';
 
 export const navigateToBeatmap = form(
 	object({ beatmap: pipe(string(), url(), nonEmpty()) }),
@@ -52,14 +52,16 @@ export const navigateToBeatmap = form(
 );
 
 export const navigateToUser = form(
-	object({ user: pipe(string(), nonEmpty()) }),
+	object({ user: union([pipe(string(), nonEmpty()), pipe(number(), integer())]) }),
 	async ({ user }) => {
+		if (typeof user === 'number' || !isNaN(parseInt(user, 10))) redirect(303, `/u/${user}`);
+
 		let userData: User.Extended;
 		try {
 			userData = await api.getUser(user.trim(), Ruleset.osu);
 		} catch (e) {
-			console.error(e);
-			error(500, 'Something went wrong');
+			const errorVar = e as APIError;
+			error(errorVar.status_code ?? 500, errorVar.message);
 		}
 
 		redirect(303, `/u/${userData.id}`);
@@ -67,14 +69,16 @@ export const navigateToUser = form(
 );
 
 export const navigateToUserPulse = form(
-	object({ user: pipe(string(), nonEmpty()) }),
+	object({ user: union([pipe(string(), nonEmpty()), pipe(number(), integer())]) }),
 	async ({ user }) => {
-		let userData;
+		if (typeof user === 'number' || !isNaN(parseInt(user, 10))) redirect(303, `/u/${user}`);
+
+		let userData: User.Extended;
 		try {
 			userData = await api.getUser(user.trim(), Ruleset.osu);
 		} catch (e) {
-			console.error(e);
-			error(500, 'Something went wrong');
+			const errorVar = e as APIError;
+			error(errorVar.status_code ?? 500, errorVar.message);
 		}
 
 		redirect(303, `/u/${userData.id}/pulse`);
