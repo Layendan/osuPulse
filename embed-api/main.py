@@ -634,9 +634,9 @@ async def get_user_recent_scores(
     )
     key_order = []
     for score in recent_scores:
-        if (
-            score.beatmap.status == aiosu.models.BeatmapRankStatus.RANKED
-            and score.pp is not None
+        if score.beatmap.status == aiosu.models.BeatmapRankStatus.RANKED and (
+            not isinstance(score.mods, list[aiosu.models.lazer.LazerMod])
+            or not any("speed_change" in mod.settings for mod in score.mods)
         ):
             beatmap_id = score.beatmap.id if score.beatmap else None
             beatmapset_id = score.beatmap.beatmapset_id if score.beatmap else None
