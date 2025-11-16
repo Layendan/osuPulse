@@ -3,14 +3,8 @@
 	import type { Attachment } from 'svelte/attachments';
 	import type { Props } from 'tippy.js';
 
-	import {
-		faCertificate,
-		faCopy,
-		faFileArrowDown,
-		faStar
-	} from '@fortawesome/free-solid-svg-icons';
+	import { faCertificate, faCopy, faFileArrowDown } from '@fortawesome/free-solid-svg-icons';
 	import { resolve } from '$app/paths';
-	import { interpolateRgb, scaleLinear } from 'd3';
 	import { Beatmapset } from 'osu-api-v2-js';
 	import { buildUrl, getEnumMods } from 'osu-web.js';
 	import Fa from 'svelte-fa';
@@ -18,6 +12,7 @@
 	import { Tween } from 'svelte/motion';
 	import { slide } from 'svelte/transition';
 	import tippy from 'tippy.js';
+	import DifficultyPill from './DifficultyPill.svelte';
 	import Mod from './Mod.svelte';
 
 	let {
@@ -47,8 +42,6 @@
 	const mods = getEnumMods(neighbor.Mods);
 	const { text: badgeText, style: badgeStyle } = getBadgeData(neighbor.Ranked);
 
-	const { bg: starBg, fg: starFg } = getDifficultyColors(neighbor.Stars);
-
 	function tooltip(content: string, props?: Partial<Props>): Attachment {
 		return (element) => {
 			const tooltip = tippy(element, { ...props, content });
@@ -77,32 +70,6 @@
 					text: 'Unknown'
 				};
 		}
-	}
-
-	function getDifficultyColors(stars: number) {
-		const difficultyColourSpectrum = scaleLinear<string>()
-			.domain([0.1, 1.25, 2, 2.5, 3.3, 4.2, 4.9, 5.8, 6.7, 7.7, 9])
-			.clamp(true)
-			.range([
-				'#4290FB',
-				'#4FC0FF',
-				'#4FFFD5',
-				'#7CFF4F',
-				'#F6F05C',
-				'#FF8068',
-				'#FF4E6F',
-				'#C645B8',
-				'#6563DE',
-				'#18158E',
-				'#000000'
-			])
-			.interpolate(interpolateRgb.gamma(2.2));
-		const foregroundColour = stars >= 6.5 ? 'hsl(45,100%,70%)' : 'hsl(200,10%,10%)';
-
-		return {
-			bg: difficultyColourSpectrum(stars),
-			fg: foregroundColour
-		};
 	}
 </script>
 
@@ -142,15 +109,7 @@
 						<div class="badge badge-sm font-bold uppercase" style={badgeStyle}>
 							{badgeText}
 						</div>
-						<div
-							class="badge badge-sm gap-1 font-bold uppercase"
-							style="--badge-bg: {starBg}; --badge-fg: {starFg}">
-							<Fa icon={faStar} />
-							{new Intl.NumberFormat(undefined, {
-								minimumFractionDigits: 2,
-								maximumFractionDigits: 2
-							}).format(neighbor.Stars)}
-						</div>
+						<DifficultyPill stars={neighbor.Stars} />
 						{#if neighbor.LastUpdated && (neighbor.LastUpdated.getTime() - Date.now()) / (1000 * 3600 * 24) <= 30}
 							<div class="badge-sm sm:badge badge-primary hidden font-bold uppercase">
 								<Fa icon={faCertificate} />

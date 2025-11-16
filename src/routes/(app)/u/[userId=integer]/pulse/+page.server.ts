@@ -1,4 +1,4 @@
-import type { User } from 'osu-api-v2-js';
+import type { APIError, User } from 'osu-api-v2-js';
 import type { PageServerLoad } from './$types';
 
 import { api } from '$lib/server';
@@ -13,8 +13,8 @@ export const load = (async ({ params }) => {
 	try {
 		user = await api.getUser(userId, Ruleset.osu);
 	} catch (e) {
-		console.error(e);
-		error(404, 'User not found');
+		const errorVar = e as APIError;
+		error(errorVar.status_code ?? 500, errorVar.message);
 	}
 
 	if (user.is_deleted) {

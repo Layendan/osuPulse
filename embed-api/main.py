@@ -818,6 +818,32 @@ async def health():
     return {"status": "ok"}
 
 
+@app.get("/get_difficulties/")
+async def get_difficulties(
+    beatmapset_id: int,
+):
+    try:
+        client: MilvusClient = app.state.milvus_client
+        expr = f"(BeatmapSetId == {beatmapset_id}) and (Mods == 0)"
+        beatmaps = client.query(
+            collection_name=COLLECTION_NAME,
+            filter=expr,
+            output_fields=[
+                "BeatmapId",
+                "BeatmapSetId",
+                "Title",
+                "Version",
+                "Ranked",
+                "Nsfw",
+                "Stars",
+                "PP",
+            ],
+        )
+        return beatmaps
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/similar_beatmaps/")
 async def api_similar_beatmaps(
     beatmap_id: int,

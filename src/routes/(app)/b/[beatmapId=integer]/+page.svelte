@@ -10,6 +10,7 @@
 	import FilterButton from '$lib/components/FilterButton.svelte';
 	import Header from '$lib/components/Header.svelte';
 	import Mod from '$lib/components/Mod.svelte';
+	import OsuDifficultyButton from '$lib/components/OsuDifficultyButton.svelte';
 	import RefetchButton from '$lib/components/RefetchButton.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import UserSearch from '$lib/components/UserSearch.svelte';
@@ -167,6 +168,14 @@
 			<UserSearch />
 		</div>
 	</div>
+
+	<span class="bg-base-300 inline-flex w-full flex-row justify-center">
+		<span class="bg-base-200 inline-flex w-fit flex-row justify-center gap-2 rounded-xl p-2">
+			{#each data.difficulties.sort((a, b) => a.Stars - b.Stars) as difficulty (difficulty.BeatmapId)}
+				<OsuDifficultyButton {difficulty} />
+			{/each}
+		</span>
+	</span>
 
 	<span class="bg-base-300 inline-flex w-full flex-row justify-center gap-2 py-4">
 		{#if enumMods.length > 0}
