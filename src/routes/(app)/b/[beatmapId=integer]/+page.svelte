@@ -170,7 +170,8 @@
 	</div>
 
 	<span class="bg-base-300 inline-flex w-full flex-row justify-center">
-		<span class="bg-base-200 inline-flex w-fit flex-row justify-center gap-2 rounded-xl p-2">
+		<span
+			class="bg-base-200 lg:3/5 inline-flex w-fit max-w-4/5 flex-row flex-wrap justify-center gap-2 rounded-xl p-2">
 			{#each data.difficulties.sort((a, b) => a.Stars - b.Stars) as difficulty (difficulty.BeatmapId)}
 				<OsuDifficultyButton {difficulty} />
 			{/each}
