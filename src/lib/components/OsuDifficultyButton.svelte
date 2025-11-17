@@ -10,10 +10,10 @@
 	import DifficultyPill from './DifficultyPill.svelte';
 	import OsuModeLogo from './OsuModeLogo.svelte';
 
-	const { difficulty }: { difficulty: BeatmapSetSearch } = $props();
+	let { difficulty }: { difficulty: BeatmapSetSearch } = $props();
 
-	const fillColour = $derived(getDifficultyColors(difficulty.Stars).bg);
-	const selected = $derived(page.params.beatmapId === difficulty.BeatmapId.toString());
+	let fillColour = $derived(getDifficultyColors(difficulty.Stars).bg);
+	let selected = $derived(page.params.beatmapId === difficulty.BeatmapId.toString());
 
 	let tooltipElement: HTMLDivElement | undefined = $state(undefined);
 
