@@ -10,10 +10,12 @@
 	import DifficultyPill from './DifficultyPill.svelte';
 	import OsuModeLogo from './OsuModeLogo.svelte';
 
-	let { difficulty }: { difficulty: BeatmapSetSearch } = $props();
+	const { difficulty }: { difficulty: BeatmapSetSearch } = $props();
 
-	let fillColour = $derived(getDifficultyColors(difficulty.Stars).bg);
-	let selected = $derived(page.params.beatmapId === difficulty.BeatmapId.toString());
+	const fillColour = $derived(getDifficultyColors(difficulty.Stars).bg);
+	const selected = $derived(
+		$state.eager(page.params.beatmapId) === difficulty.BeatmapId.toString()
+	);
 
 	let tooltipElement: HTMLDivElement | undefined = $state(undefined);
 
@@ -32,7 +34,7 @@
 	class="btn btn-square btn-ghost outline-base-content p-1 text-base opacity-20 transition-opacity hover:opacity-100"
 	class:outline-2={selected}
 	class:opacity-100={selected}
-	style="color: {fillColour};"
+	style="color: {fillColour}; stroke: {fillColour}; fill: {fillColour}"
 	aria-label="navigate to beatmap {difficulty.Version}"
 	{@attach tooltip({ allowHTML: true })}>
 	<OsuModeLogo />
