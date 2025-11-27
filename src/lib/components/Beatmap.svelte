@@ -80,9 +80,9 @@
 		class:rounded-b-none={isDetailed}>
 		<img
 			src={buildUrl.beatmapsetCover(neighbor.BeatmapSetId)}
-			class="absolute z-0 h-full w-full object-cover blur-xs"
+			class="absolute inset-0 z-0 size-full rounded-4xl object-cover blur-xs"
 			alt="beatmapset cover" />
-		<div class="bg-base-100/80 pointer-events-none absolute inset-0 z-10"></div>
+		<div class="bg-base-100/80 pointer-events-none absolute inset-0 z-10 size-full"></div>
 		<a
 			href={resolve(`/b/${neighbor.BeatmapId}?mods=${neighbor.Mods}`)}
 			class="relative z-10 inline-flex w-full flex-row outline-none">

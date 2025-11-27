@@ -3,6 +3,8 @@
 	fill="currentColor"
 	stroke="currentColor"
 	viewBox="0 0 666.66669 666.66669"
+	width="100%"
+	height="100%"
 	xmlns="http://www.w3.org/2000/svg">
 	<defs id="osuDiffDefs1">
 		<clipPath clipPathUnits="userSpaceOnUse" id="osuDiffClipPath2">
