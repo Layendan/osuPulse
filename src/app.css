@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @custom-variant ff-only (@-moz-document url-prefix());
+@custom-variant safari-only (@supports (hanging-punctuation: first));
 @plugin "daisyui";
 @plugin "daisyui/theme" {
 	name: 'pulse';

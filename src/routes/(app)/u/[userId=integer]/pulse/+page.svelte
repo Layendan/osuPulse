@@ -99,6 +99,7 @@
 				{data.user.username}'s pulse
 				<button
 					class="text-base-content cursor-context-menu text-xl"
+					aria-label="more information"
 					{@attach tooltip(
 						'these beatmaps are similar to your recent plays, weighted towards your most recent scores',
 						{ placement: 'bottom' }

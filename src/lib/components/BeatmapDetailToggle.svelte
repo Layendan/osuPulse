@@ -25,6 +25,7 @@
 
 <label
 	class="toggle toggle-xl text-base-content my-auto text-xl"
+	aria-label="toggle beatmap details"
 	{@attach tooltip('toggle beatmap details', { placement: 'bottom' })}>
 	<input type="checkbox" bind:checked={isDetailed} />
 	<Fa icon={faGripLines} class="m-auto" />

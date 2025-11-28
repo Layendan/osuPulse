@@ -80,10 +80,10 @@
 		class:rounded-b-none={isDetailed}>
 		<img
 			src={buildUrl.beatmapsetCover(neighbor.BeatmapSetId)}
-			class="absolute inset-0 z-0 size-full object-cover"
+			class="not-safari-only:blur-xs absolute inset-0 z-0 size-full object-cover"
 			alt="beatmapset cover" />
 		<div
-			class="bg-base-100/80 pointer-events-none absolute inset-0 z-10 size-full backdrop-blur-xs">
+			class="bg-base-100/80 safari-only:backdrop-blur-xs pointer-events-none absolute inset-0 z-10 size-full">
 		</div>
 		<a
 			href={resolve(`/b/${neighbor.BeatmapId}?mods=${neighbor.Mods}`)}
@@ -159,12 +159,14 @@
 			<button
 				onclick={() => navigator.clipboard.writeText(neighbor.BeatmapId.toString())}
 				class="cursor-pointer opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100"
+				aria-label="copy beatmap id"
 				{@attach tooltip('copy beatmap id')}>
 				<Fa icon={faCopy} />
 			</button>
 			<a
 				href="osu://b/{neighbor.BeatmapId}"
 				class="opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100"
+				aria-label="open in osu!direct"
 				{@attach tooltip('open in osu!direct')}>
 				<Fa icon={faFileArrowDown} />
 			</a>

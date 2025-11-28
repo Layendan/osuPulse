@@ -98,6 +98,7 @@
 				we think you'd like these beatmaps
 				<button
 					class="cursor-context-menu text-xl"
+					aria-label="more information"
 					{@attach tooltip(
 						'these beatmaps are similar to your top plays, weighted towards your highest performance scores',
 						{ placement: 'bottom' }

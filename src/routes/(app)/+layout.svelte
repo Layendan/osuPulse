@@ -48,6 +48,7 @@
 				target="_blank"
 				rel="noopener noreferrer external"
 				class="text-2xl"
+				aria-label="discord server link"
 				{@attach tooltip('discord')}>
 				<Fa icon={faDiscord} />
 			</a>
@@ -56,6 +57,7 @@
 				target="_blank"
 				rel="noopener noreferrer external"
 				class="text-2xl"
+				aria-label="github link"
 				{@attach tooltip('github')}>
 				<Fa icon={faGithub} />
 			</a>
@@ -64,6 +66,7 @@
 				target="_blank"
 				rel="noopener noreferrer external"
 				class="size-6"
+				aria-label="osu! profile link"
 				{@attach tooltip('osu!')}>
 				<OsuLogo />
 			</a>

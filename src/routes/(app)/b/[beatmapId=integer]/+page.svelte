@@ -129,6 +129,7 @@
 				similar beatmaps
 				<button
 					class="cursor-context-menu text-xl"
+					aria-label="more information"
 					{@attach tooltip(
 						`these beatmaps are the most similar to ${data.beatmap.beatmapset.title}, based on the estimated skills required to pass it (accuracy, aim, flashlight, precision, reaction, stamina, and streams)`,
 						{ placement: 'bottom' }
