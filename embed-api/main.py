@@ -216,7 +216,7 @@ async def download_missing_beatmapsets(client: MilvusClient):
                 url = f"https://api.nerinyan.moe/d/{beatmapset['id']}?noBg=true&NoHitsound=true&NoStoryboard=true&noVideo=true"
                 await download_file(url, ROOT_DIR)
                 # 25 reqs/min
-                await asyncio.sleep(2.4)
+                await asyncio.sleep(3)
                 index += 1
                 num_missing += 1
 
