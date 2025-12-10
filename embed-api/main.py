@@ -1,10 +1,12 @@
 import asyncio
 import os
 import shutil
+import struct
 import subprocess
 from collections import defaultdict
 from contextlib import asynccontextmanager
 from math import log2
+from pathlib import Path
 from urllib.parse import unquote
 
 import aiohttp
@@ -214,8 +216,7 @@ async def download_missing_beatmapsets(client: MilvusClient):
                 if beatmapset_exists_in_milvus(client, beatmapset["id"]):
                     continue
 
-                # url = f"https://api.nerinyan.moe/d/{beatmapset['id']}?noBg=true&NoHitsound=true&NoStoryboard=true&noVideo=true"
-                url = f"https://catboy.best/d/{beatmapset['id']}"
+                url = f"https://api.nerinyan.moe/d/{beatmapset['id']}?noBg=true&NoHitsound=true&NoStoryboard=true&noVideo=true"
                 await download_file(url, ROOT_DIR)
                 index += 1
                 num_missing += 1
@@ -310,6 +311,54 @@ def calculate_strains():
         print("No data to write.")
 
 
+EOCD_SIGNATURE = b"\x50\x4b\x05\x06"
+EOCD_FIXED_SIZE = 22  # bytes before the variable-length comment
+MAX_COMMENT = 0xFFFF  # spec limit
+
+
+def repair_zip(path: Path) -> bool:
+    data = path.read_bytes()
+    # Search only in the last 64K+EOCD, like zipfile does
+    search_start = max(0, len(data) - (MAX_COMMENT + EOCD_FIXED_SIZE))
+    pos = data.rfind(EOCD_SIGNATURE, search_start)
+    if pos == -1:
+        print(f"[SKIP] No EOCD found: {path}")
+        return False
+
+    # EOCD layout: 4s H H H H I I H  (total 22 bytes)
+    if pos + EOCD_FIXED_SIZE > len(data):
+        print(f"[SKIP] EOCD truncated: {path}")
+        return False
+
+    # Unpack to get comment length (last field)
+    fields = struct.unpack_from("<4sHHHHIIH", data, pos)
+    comment_len = fields[-1]
+
+    # End of EOCD including comment
+    end_eocd = pos + EOCD_FIXED_SIZE + comment_len
+    if end_eocd > len(data):
+        # Inconsistent comment length -> probably not a valid ZIP; do not touch
+        print(f"[SKIP] Inconsistent EOCD/comment: {path}")
+        return False
+
+    if end_eocd == len(data):
+        # Already clean; nothing to do
+        print(f"[OK] Already clean: {path}")
+        return True
+
+    # Only now is it safe to truncate trailing junk
+    path.write_bytes(data[:end_eocd])
+    print(f"[FIXED] Truncated trailing junk: {path}")
+    return True
+
+
+def repair_all_zips(dir_path: str):
+    base = Path(dir_path)
+    for zip_path in base.glob("*.osz"):
+        if not repair_zip(zip_path):
+            os.remove(zip_path)
+
+
 async def process_new_ranked_maps(client: MilvusClient):
     print("Downloading missing beatmapsets")
 
@@ -319,6 +368,10 @@ async def process_new_ranked_maps(client: MilvusClient):
     if downloaded_len == 0:
         print("No beatmaps to download")
         return
+
+    print("Removing corrupted files")
+
+    repair_all_zips(ROOT_DIR)
 
     print("Creating dataset")
 
