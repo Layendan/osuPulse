@@ -1,6 +1,7 @@
 import asyncio
 import os
 import shutil
+import struct
 import subprocess
 from collections import defaultdict
 from contextlib import asynccontextmanager
@@ -309,22 +310,51 @@ def calculate_strains():
         print("No data to write.")
 
 
-def repair_zip_inplace(path: str | Path) -> None:
-    path = Path(path)
+EOCD_SIGNATURE = b"\x50\x4b\x05\x06"
+EOCD_FIXED_SIZE = 22  # bytes before the variable-length comment
+MAX_COMMENT = 0xFFFF  # spec limit
+
+
+def repair_zip(path: Path) -> bool:
     data = path.read_bytes()
-    sig = b"\x50\x4b\x05\x06"  # EOCD signature
-    pos = data.rfind(sig)
+    # Search only in the last 64K+EOCD, like zipfile does
+    search_start = max(0, len(data) - (MAX_COMMENT + EOCD_FIXED_SIZE))
+    pos = data.rfind(EOCD_SIGNATURE, search_start)
     if pos == -1:
-        raise ValueError("EOCD signature not found; file may be truncated/corrupt")
-    # 22 bytes is the minimum EOCD record size
-    repaired = data[: pos + 22]
-    path.write_bytes(repaired)
+        print(f"[SKIP] No EOCD found: {path}")
+        return False
+
+    # EOCD layout: 4s H H H H I I H  (total 22 bytes)
+    if pos + EOCD_FIXED_SIZE > len(data):
+        print(f"[SKIP] EOCD truncated: {path}")
+        return False
+
+    # Unpack to get comment length (last field)
+    fields = struct.unpack_from("<4sHHHHIIH", data, pos)
+    comment_len = fields[-1]
+
+    # End of EOCD including comment
+    end_eocd = pos + EOCD_FIXED_SIZE + comment_len
+    if end_eocd > len(data):
+        # Inconsistent comment length -> probably not a valid ZIP; do not touch
+        print(f"[SKIP] Inconsistent EOCD/comment: {path}")
+        return False
+
+    if end_eocd == len(data):
+        # Already clean; nothing to do
+        print(f"[OK] Already clean: {path}")
+        return False
+
+    # Only now is it safe to truncate trailing junk
+    path.write_bytes(data[:end_eocd])
+    print(f"[FIXED] Truncated trailing junk: {path}")
+    return True
 
 
 def repair_all_zips(dir_path: str):
     base = Path(dir_path)
     for zip_path in base.glob("*.osz"):
-        repair_zip_inplace(zip_path)
+        repair_zip(zip_path)
 
 
 async def process_new_ranked_maps(client: MilvusClient):
