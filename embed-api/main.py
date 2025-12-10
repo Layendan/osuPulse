@@ -149,7 +149,6 @@ async def download_file(url: str, filepath: str):
                 filename = header.split("filename=")[1].replace('"', "")
             else:
                 filename = url.split("/")[-1]
-            print(f"{response.status}: {filename}")
             path = os.path.join(filepath, filename)
             with open(path, mode="wb") as file:
                 while True:
@@ -214,7 +213,7 @@ async def download_missing_beatmapsets(client: MilvusClient):
                 if beatmapset_exists_in_milvus(client, beatmapset["id"]):
                     continue
 
-                url = f"https://api.nerinyan.moe/d/{beatmapset['id']}?noBg=true&NoHitsound=true&NoStoryboard=true&noVideo=true"
+                url = f"https://api.nerinyan.moe/d/{beatmapset['id']}"
                 await download_file(url, ROOT_DIR)
                 index += 1
                 num_missing += 1
