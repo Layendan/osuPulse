@@ -2,6 +2,7 @@ import asyncio
 import os
 import shutil
 import subprocess
+import zipfile
 from collections import defaultdict
 from contextlib import asynccontextmanager
 from math import log2
@@ -141,6 +142,9 @@ async def background_beatmap_ingest(app):
             await asyncio.sleep(1800)  # 30 minutes
 
 
+CHUNK_SIZE = 1 << 15  # 32 KiB
+
+
 async def download_file(url: str, filepath: str):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
@@ -150,13 +154,22 @@ async def download_file(url: str, filepath: str):
             else:
                 filename = url.split("/")[-1]
             path = os.path.join(filepath, filename)
-            with open(path, mode="wb") as file:
+            with open(path, "wb") as file:
                 while True:
-                    chunk = await response.content.read()
+                    chunk = await response.content.read(CHUNK_SIZE)
                     if not chunk:
                         break
                     file.write(chunk)
-                print(f"Downloaded file {filename}")
+                print(f"Downloaded file {filename}, isValid: {is_valid_zip(path)}")
+
+
+def is_valid_zip(path: str) -> bool:
+    try:
+        with zipfile.ZipFile(path, "r") as zf:
+            bad = zf.testzip()
+            return bad is None
+    except zipfile.BadZipFile:
+        return False
 
 
 def beatmapset_exists_in_milvus(client: MilvusClient, beatmapsetid: int):
