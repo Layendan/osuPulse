@@ -148,7 +148,7 @@ async def download_file(url: str, filepath: str):
                 header = response.headers["content-disposition"]
                 filename = header.split("filename=")[1].replace('"', "")
             else:
-                filename = url.split("/")[-1]
+                filename = f"{url.split("/")[-1]}.osz"
             path = os.path.join(filepath, filename)
             with open(path, "wb") as file:
                 while True:
