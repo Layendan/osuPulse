@@ -214,7 +214,7 @@ async def download_missing_beatmapsets(client: MilvusClient):
                     continue
 
                 # url = f"https://api.nerinyan.moe/d/{beatmapset['id']}?noBg=true&NoHitsound=true&NoStoryboard=true&noVideo=true"
-                url = f"https://beatconnect.io/b/{beatmapset['id']}/"
+                url = f"https://beatconnect.io/b/{beatmapset['id']}"
                 await download_file(url, ROOT_DIR)
                 index += 1
                 num_missing += 1
