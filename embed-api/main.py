@@ -5,6 +5,7 @@ import subprocess
 from collections import defaultdict
 from contextlib import asynccontextmanager
 from math import log2
+from pathlib import Path
 
 import aiohttp
 import aiosu
@@ -215,8 +216,6 @@ async def download_missing_beatmapsets(client: MilvusClient):
 
                 url = f"https://api.nerinyan.moe/d/{beatmapset['id']}?noBg=true&NoHitsound=true&NoStoryboard=true&noVideo=true"
                 await download_file(url, ROOT_DIR)
-                # 25 reqs/min
-                await asyncio.sleep(3)
                 index += 1
                 num_missing += 1
 
@@ -310,6 +309,24 @@ def calculate_strains():
         print("No data to write.")
 
 
+def repair_zip_inplace(path: str | Path) -> None:
+    path = Path(path)
+    data = path.read_bytes()
+    sig = b"\x50\x4b\x05\x06"  # EOCD signature
+    pos = data.rfind(sig)
+    if pos == -1:
+        raise ValueError("EOCD signature not found; file may be truncated/corrupt")
+    # 22 bytes is the minimum EOCD record size
+    repaired = data[: pos + 22]
+    path.write_bytes(repaired)
+
+
+def repair_all_zips(dir_path: str):
+    base = Path(dir_path)
+    for zip_path in base.glob("*.osz"):
+        repair_zip_inplace(zip_path)
+
+
 async def process_new_ranked_maps(client: MilvusClient):
     print("Downloading missing beatmapsets")
 
@@ -319,6 +336,10 @@ async def process_new_ranked_maps(client: MilvusClient):
     if downloaded_len == 0:
         print("No beatmaps to download")
         return
+
+    print("Reparing OSZ files")
+
+    repair_all_zips(ROOT_DIR)
 
     print("Creating dataset")
 
