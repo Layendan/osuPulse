@@ -2,7 +2,6 @@ import asyncio
 import os
 import shutil
 import subprocess
-import zipfile
 from collections import defaultdict
 from contextlib import asynccontextmanager
 from math import log2
@@ -142,9 +141,6 @@ async def background_beatmap_ingest(app):
             await asyncio.sleep(1800)  # 30 minutes
 
 
-CHUNK_SIZE = 1 << 15  # 32 KiB
-
-
 async def download_file(url: str, filepath: str):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
@@ -156,20 +152,11 @@ async def download_file(url: str, filepath: str):
             path = os.path.join(filepath, filename)
             with open(path, "wb") as file:
                 while True:
-                    chunk = await response.content.read(CHUNK_SIZE)
+                    chunk = await response.content.read()
                     if not chunk:
                         break
                     file.write(chunk)
-                print(f"Downloaded file {filename}, isValid: {is_valid_zip(path)}")
-
-
-def is_valid_zip(path: str) -> bool:
-    try:
-        with zipfile.ZipFile(path, "r") as zf:
-            bad = zf.testzip()
-            return bad is None
-    except zipfile.BadZipFile:
-        return False
+                print(f"Downloaded file {filename}")
 
 
 def beatmapset_exists_in_milvus(client: MilvusClient, beatmapsetid: int):
@@ -226,7 +213,8 @@ async def download_missing_beatmapsets(client: MilvusClient):
                 if beatmapset_exists_in_milvus(client, beatmapset["id"]):
                     continue
 
-                url = f"https://api.nerinyan.moe/d/{beatmapset['id']}"
+                # url = f"https://api.nerinyan.moe/d/{beatmapset['id']}?noBg=true&NoHitsound=true&NoStoryboard=true&noVideo=true"
+                url = f"https://osu.ppy.sh/beatmapsets/{beatmapset['id']}/download"
                 await download_file(url, ROOT_DIR)
                 index += 1
                 num_missing += 1
