@@ -5,6 +5,7 @@ import subprocess
 from collections import defaultdict
 from contextlib import asynccontextmanager
 from math import log2
+from urllib.parse import unquote
 
 import aiohttp
 import aiosu
@@ -146,7 +147,7 @@ async def download_file(url: str, filepath: str):
         async with session.get(url) as response:
             if "content-disposition" in response.headers:
                 header = response.headers["content-disposition"]
-                filename = header.split("filename=")[1].replace('"', "")
+                filename = unquote(header.split("filename=")[1].replace('"', ""))
             else:
                 filename = f"{url.split('/')[-1]}.osz"
             path = os.path.join(filepath, filename)
