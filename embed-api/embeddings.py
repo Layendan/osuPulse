@@ -493,6 +493,7 @@ def generate_embeddings_and_insert_into_database(
 
                 if len(results) == BATCH_SIZE:
                     df = pd.DataFrame(results)
+                    df = enforce_dtypes(df)  # Ensure schema consistency
                     records = df.to_dict("records")
                     client.insert(collection_name=collection_name, data=records)
                     records.clear()
@@ -501,6 +502,7 @@ def generate_embeddings_and_insert_into_database(
 
     if len(results) > 0:
         df = pd.DataFrame(results)
+        df = enforce_dtypes(df)  # Ensure schema consistency
         records = df.to_dict("records")
         client.insert(collection_name=collection_name, data=records)
         records.clear()
