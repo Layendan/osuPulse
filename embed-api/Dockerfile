@@ -15,7 +15,7 @@ RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
 
 COPY . .
 
-RUN chmod +x ./osu_skills_rs_0.1.0_linux-x64
+RUN chmod +x ./osu_skills_rs_0.1.1_linux-x64
 RUN chmod +x ./Mapperator.ConsoleAppLinux
 
 EXPOSE 8000
