@@ -217,7 +217,7 @@ EXPECTED_DTYPES = {
     "Hp": "float64",
     "Bpm": "float64",
     "HitLength": "int64",
-    "RankedDate": "timestamp",
+    "RankedDate": "datetime64[ns]",
 }
 
 
