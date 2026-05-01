@@ -228,11 +228,15 @@ def enforce_dtypes(df):
                 df[col] = df[col].astype("string")
             elif dtype == "bool":
                 df[col] = df[col].astype("bool")
-            elif dtype == "object":
-                # Keep as is for list type columns like Embedding
-                pass
             else:
                 df[col] = df[col].astype(dtype)
+
+    # Handle RankedDate for TIMESTAMPTZ
+    if "RankedDate" in df.columns:
+        df["RankedDate"] = pd.to_datetime(df["RankedDate"]).dt.strftime('%Y-%m-%dT%H:%M:%S%z')
+
+    if "Embedding" in df.columns:
+        df["Embedding"] = df["Embedding"].apply(list)
     return df
 
 
