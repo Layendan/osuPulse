@@ -5,11 +5,10 @@ import joblib
 import numpy as np
 import pandas as pd
 import pyarrow.parquet as pq
+from calcModStats import mod_calculator_factory
 from pymilvus import MilvusClient
 from scipy.interpolate import interp1d
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
-
-from calcModStats import mod_calculator_factory
 
 NUM_SCALER_PATH = "num_scaler.joblib"
 SKILL_SCALER_PATH = "skill_scaler.joblib"
@@ -54,9 +53,14 @@ GENRES = [
 ]
 genre_encoder.fit(np.array(GENRES).reshape(-1, 1))
 
+EMBED_DTYPE = np.int8           # or np.int8
+STRAIN_BINS = 128               # try 128 first; 256 if quality drops too much
+QUANT_MIN = -6.0                # for int8 only
+QUANT_MAX = 6.0                 # for int8 only
+
 
 # Utility Functions
-def rescale_to_bins(strain_array, num_bins=512):
+def rescale_to_bins(strain_array, num_bins=STRAIN_BINS):
     flat = []
     for x in np.array(strain_array).flatten():
         if isinstance(x, (float, int, np.float32, np.float64, np.int32, np.int64)):
@@ -66,19 +70,32 @@ def rescale_to_bins(strain_array, num_bins=512):
                 [
                     float(y)
                     for y in np.array(x).flatten()
-                    if isinstance(
-                        y, (float, int, np.float32, np.float64, np.int32, np.int64)
-                    )
+                    if isinstance(y, (float, int, np.float32, np.float64, np.int32, np.int64))
                 ]
             )
-    strain_array = np.array(flat)
+
+    strain_array = np.array(flat, dtype=np.float32)
     if len(strain_array) == 0:
-        return np.zeros(num_bins)
+        return np.zeros(num_bins, dtype=np.float32)
+
+    if len(strain_array) == 1:
+        return np.full(num_bins, strain_array[0], dtype=np.float32)
 
     x_original = np.linspace(0, 1, len(strain_array))
     x_new = np.linspace(0, 1, num_bins)
     f = interp1d(x_original, strain_array, kind="linear", fill_value="extrapolate")
-    return f(x_new)
+    return f(x_new).astype(np.float32)
+
+def quantize_embedding(x, dtype=EMBED_DTYPE):
+    x = np.asarray(x, dtype=np.float32)
+
+    if dtype == np.int8:
+        clipped = np.clip(x, QUANT_MIN, QUANT_MAX)
+        scaled = (clipped - QUANT_MIN) / (QUANT_MAX - QUANT_MIN)
+        q = np.round(scaled * 255.0 - 128.0).astype(np.int8)
+        return q
+
+    return x.astype(dtype)
 
 
 # Load skills CSV files into dict by mod key
@@ -94,22 +111,24 @@ def load_skills(skills_folder="skills_output"):
                     "BeatmapsetID",
                     "Mods",
                     "Stamina",
-                    "Streams",
-                    "Aim",
+                    "Tenacity",
+                    "Agility",
                     "Accuracy",
                     "Precision",
                     "Reaction",
+                    "Memory",
                 ],
                 dtype={
                     "BeatmapID": "Int64",
                     "BeatmapsetID": "Int64",
                     "Mods": "Int64",
                     "Stamina": "float64",
-                    "Streams": "float64",
-                    "Aim": "float64",
+                    "Tenacity": "float64",
+                    "Agility": "float64",
                     "Accuracy": "float64",
                     "Precision": "float64",
                     "Reaction": "float64",
+                    "Memory": "float64",
                 },
                 engine="python",
                 quoting=csv.QUOTE_MINIMAL,
@@ -147,14 +166,14 @@ def create_embedding(
     num_scaled = num_scaler.transform(num_features_with_genre)
 
     skill_values = skills_row[
-        ["Stamina", "Streams", "Aim", "Accuracy", "Precision", "Reaction"]
+        ["Stamina", "Tenacity", "Agility", "Accuracy", "Precision", "Reaction"]
     ].values.reshape(1, -1)
     skill_scaled = skill_scaler.transform(skill_values)
 
     strain_vecs = []
     for strain_name in ["AimStrain", "AimNoSlidersStrain", "SpeedStrain"]:
         strain_arr = row_diff[strain_name]
-        strain_bin = rescale_to_bins(strain_arr, 512)
+        strain_bin = rescale_to_bins(strain_arr, STRAIN_BINS)
         strain_vecs.append(strain_bin)
     strain_concat = np.concatenate(strain_vecs).reshape(1, -1)
     strain_scaled = strain_scaler.transform(strain_concat)
@@ -169,7 +188,7 @@ def create_embedding(
     weighted_strain = strain_scaled.flatten() * strain_weight
 
     embedding = np.hstack([weighted_features, weighted_skills, weighted_strain])
-
+    embedding = quantize_embedding(embedding)
     return embedding
 
 
@@ -198,6 +217,7 @@ EXPECTED_DTYPES = {
     "Hp": "float64",
     "Bpm": "float64",
     "HitLength": "int64",
+    "RankedDate": "datetime64[ns]",
 }
 
 
@@ -270,6 +290,7 @@ def generate_embeddings_and_insert_into_database(
             "Cs",
             "Drain",
             "HitLength",
+            "RankedDate",
         ],
     ).set_index("Id")
 
@@ -345,14 +366,14 @@ def generate_embeddings_and_insert_into_database(
             num_features_list.append(np.hstack([num_features, genre_vec]))
 
             skill_vals = skills_row[
-                ["Stamina", "Streams", "Aim", "Accuracy", "Precision", "Reaction"]
+                ["Stamina", "Tenacity", "Agility", "Accuracy", "Precision", "Reaction"]
             ].values
             skill_values_list.append(skill_vals)
 
             strain_vecs = []
             for strain_name in ["AimStrain", "AimNoSlidersStrain", "SpeedStrain"]:
                 strain_arr = diff_row[strain_name]
-                strain_bin = rescale_to_bins(strain_arr, 512)
+                strain_bin = rescale_to_bins(strain_arr, STRAIN_BINS)
                 strain_vecs.append(strain_bin)
             strain_concat = np.concatenate(strain_vecs)
             strain_list.append(strain_concat)
@@ -462,6 +483,7 @@ def generate_embeddings_and_insert_into_database(
                         "Hp": adjusted_meta.get("Drain"),
                         "Bpm": adjusted_meta.get("Bpm"),
                         "HitLength": adjusted_meta.get("HitLength"),
+                        "RankedDate": adjusted_meta.get("RankedDate"),
                     }
                 )
 

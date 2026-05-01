@@ -72,6 +72,12 @@ export const getBeatmapNeighbors = query(
 
 		const neighbors: NeighborResponse = await response.json();
 
-		return neighbors;
+		return {
+			...neighbors,
+			neighbors: neighbors.neighbors.map((neighbor) => ({
+				...neighbor,
+				LastUpdated: new Date(neighbor.LastUpdated)
+			}))
+		};
 	}
 );

@@ -66,28 +66,38 @@ export function isDifficultyIncrease(mod: Mod) {
 	return difficultyIncreaseMods.includes(mod);
 }
 
-export function getDifficultyColors(stars: number) {
-	const difficultyColourSpectrum = scaleLinear<string>()
-		.domain([0.1, 1.25, 2, 2.5, 3.3, 4.2, 4.9, 5.8, 6.7, 7.7, 9])
-		.clamp(true)
-		.range([
-			'#4290FB',
-			'#4FC0FF',
-			'#4FFFD5',
-			'#7CFF4F',
-			'#F6F05C',
-			'#FF8068',
-			'#FF4E6F',
-			'#C645B8',
-			'#6563DE',
-			'#18158E',
-			'#000000'
-		])
-		.interpolate(interpolateRgb.gamma(2.2));
-	const foregroundColour = stars >= 6.5 ? 'hsl(45,100%,70%)' : 'hsl(200,10%,10%)';
+const difficultyColourSpectrum = scaleLinear<string>()
+	.domain([0.1, 1.25, 2, 2.5, 3.3, 4.2, 4.9, 5.8, 6.7, 7.7, 9])
+	.clamp(true)
+	.range([
+		'#4290FB',
+		'#4FC0FF',
+		'#4FFFD5',
+		'#7CFF4F',
+		'#F6F05C',
+		'#FF8068',
+		'#FF4E6F',
+		'#C645B8',
+		'#6563DE',
+		'#18158E',
+		'#000000'
+	])
+	.interpolate(interpolateRgb.gamma(2.2));
+const difficultyTextColourSpectrum = scaleLinear<string>()
+	.domain([9, 9.9, 10.6, 11.5, 12.4])
+	.clamp(true)
+	.range(['#F6F05C', '#FF8068', '#FF4E6F', '#C645B8', '#6563DE', '#18158E'])
+	.interpolate(interpolateRgb.gamma(2.2));
 
+const getTextColours = (rating: number) => {
+	if (rating < 6.5) return '#000000';
+	if (rating < 9) return '#F6F05C';
+	return difficultyTextColourSpectrum(rating);
+};
+
+export function getDifficultyColors(rating: number) {
 	return {
-		bg: difficultyColourSpectrum(stars),
-		fg: foregroundColour
+		bg: difficultyColourSpectrum(rating),
+		fg: getTextColours(rating)
 	};
 }

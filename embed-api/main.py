@@ -41,7 +41,7 @@ MOD_PRESETS = {
     "dc": 256,
 }
 MAPPERATOR = "./Mapperator.ConsoleAppLinux"
-OSU_SKILLS_RS = "./osu_skills_rs_0.1.0_linux-x64"
+OSU_SKILLS_RS = "./osu_skills_rs_0.1.1_linux-x64"
 MOD_PRESETS_SKILLS = {
     "nm": 0,
     "ez": 2,
@@ -194,7 +194,7 @@ async def download_missing_beatmapsets(client: MilvusClient):
         while True:
             params = {
                 "m": "osu",
-                "s": "ranked",
+                "s": "ranked,loved",
                 "nsfw": "true",
                 "sort": "ranked_desc",
                 "ps": page_size,
@@ -244,7 +244,7 @@ def calculate_strains():
     writer = None  # Will be initialized after the first batch
 
     for row in df[columns].itertuples():
-        if int(row.ModeInt) != 0 or int(row.Ranked) != 1:
+        if int(row.ModeInt) != 0 or not (int(row.Ranked) == 1 or int(row.Ranked) == 4 or int(row.Ranked) == 2):
             continue
 
         path = os.path.join(
@@ -404,7 +404,7 @@ async def process_new_ranked_maps(client: MilvusClient):
             "--output-type=file-csv",
             f"--out={out_csv}",
             f"--mods={mod_val}",
-            "--alg=default",
+            "--alg=rebalance_1",
         ]
         try:
             subprocess.run(command, check=True)
@@ -556,6 +556,7 @@ def find_similar_beatmaps_by_id(
             "BeatmapSetId",
             "Stars",
             "Ranked",
+            "RankedDate"
         ],
         limit=1,
     )
@@ -597,6 +598,7 @@ def find_similar_beatmaps_by_id(
             "Stars",
             "PP",
             "Ranked",
+            "RankedDate",
         ],
     )
     if not search_results or len(search_results[0]) <= 1:
@@ -631,6 +633,7 @@ def find_similar_beatmaps_by_id(
             "Distance": hit.distance,
             "Stars": neighbor_stars,
             "PP": entity["PP"],
+            "LastUpdated": entity["RankedDate"],
             "AccMult": acc_mult,
         }
         rows.append(row)
@@ -689,7 +692,7 @@ async def get_user_recent_scores(
     )
     key_order = []
     for score in recent_scores:
-        if score.beatmap.status == aiosu.models.BeatmapRankStatus.RANKED and (
+        if (score.beatmap.status == aiosu.models.BeatmapRankStatus.RANKED or score.beatmap.status == aiosu.models.BeatmapRankStatus.APPROVED or score.beatmap.status == aiosu.models.BeatmapRankStatus.LOVED) and (
             not isinstance(score.mods, list)
             or not any("speed_change" in mod.settings for mod in score.mods)
         ):
@@ -756,6 +759,7 @@ def tally_neighbors(
             "ranked": None,
             "stars": None,
             "pp": None,
+            "updated": None,
         }
     )
     # max_distance = None
@@ -825,6 +829,8 @@ def tally_neighbors(
                 neighbor_info[key]["stars"] = row["Stars"]
             if neighbor_info[key]["pp"] is None:
                 neighbor_info[key]["pp"] = row["PP"]
+            if neighbor_info[key]["updated"] is None:
+                neighbor_info[key]["updated"] = row["LastUpdated"]
     epsilon = 1e-6
     summary = []
     beatmap_to_index = {
@@ -846,6 +852,7 @@ def tally_neighbors(
                 "Ranked": val["ranked"],
                 "Stars": val["stars"],
                 "PP": val["pp"],
+                "LastUpdated": val["updated"],
                 "Count": count,
                 "MinDistance": min_distance,
                 "MaxWeight": max_weight,

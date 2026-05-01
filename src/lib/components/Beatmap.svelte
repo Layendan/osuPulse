@@ -58,6 +58,12 @@
 					text: 'Ranked'
 				};
 
+			case Beatmapset.RankStatus.Approved:
+				return {
+					style: `--badge-bg: hsl(90,100%,70%); --badge-fg: hsl(200,10%,25%);`,
+					text: 'Approved'
+				};
+
 			case Beatmapset.RankStatus.Loved:
 				return {
 					style: `--badge-bg: hsl(333,100%,70%); --badge-fg: hsl(200,10%,25%);`,
@@ -112,8 +118,8 @@
 							{badgeText}
 						</div>
 						<DifficultyPill stars={neighbor.Stars} />
-						{#if neighbor.LastUpdated && (neighbor.LastUpdated.getTime() - Date.now()) / (1000 * 3600 * 24) <= 30}
-							<div class="badge-sm sm:badge badge-primary hidden font-bold uppercase">
+						{#if neighbor.LastUpdated && (Date.now() - neighbor.LastUpdated.getTime()) / (1000 * 3600 * 24) <= 90}
+							<div class="badge-sm badge badge-accent hidden font-bold uppercase sm:inline-flex">
 								<Fa icon={faCertificate} />
 								New
 							</div>

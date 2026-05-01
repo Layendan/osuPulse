@@ -69,6 +69,12 @@ export const getUserPulseNeighbors = query(
 
 		const neighbors: NeighborResponse = await response.json();
 
-		return neighbors;
+		return {
+			...neighbors,
+			top_neighbors: neighbors.top_neighbors.map((neighbor) => ({
+				...neighbor,
+				LastUpdated: new Date(neighbor.LastUpdated)
+			}))
+		};
 	}
 );
