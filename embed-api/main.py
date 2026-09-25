@@ -208,12 +208,11 @@ def cleanup_dirs():
     os.makedirs(MAPPERATOR_DIR, exist_ok=True)
 
 
-async def download_missing_beatmapsets(client: MilvusClient, status: str):
+async def download_missing_beatmapsets(client: MilvusClient, status: str, page_size: int = 50):
     index = 0
     downloaded_pages_without_results = 0
 
     page = 0
-    page_size = 100
 
     async with aiohttp.ClientSession() as session:
         while True:
@@ -434,8 +433,8 @@ async def process_new_ranked_maps(client: MilvusClient):
     print("Downloading missing beatmapsets")
 
     # Download beatmaps
-    downloaded_len = await download_missing_beatmapsets(client, "1")
-    downloaded_len += await download_missing_beatmapsets(client, "4")
+    downloaded_len = await download_missing_beatmapsets(client, "1", 100)
+    downloaded_len += await download_missing_beatmapsets(client, "4", 5)
 
     if downloaded_len == 0:
         print("No beatmaps to download")
