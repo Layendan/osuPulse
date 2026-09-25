@@ -213,7 +213,7 @@ async def download_missing_beatmapsets(client: MilvusClient, status: str):
     downloaded_pages_without_results = 0
 
     page = 0
-    page_size = 50
+    page_size = 100
 
     async with aiohttp.ClientSession() as session:
         while True:
@@ -292,7 +292,7 @@ async def download_missing_beatmapsets(client: MilvusClient, status: str):
                 downloaded_pages_without_results = 0
 
             # Stop after 100 consecutive pages contain no new maps.
-            if downloaded_pages_without_results >= 100:
+            if downloaded_pages_without_results >= 5:
                 return index
 
             page += 1
