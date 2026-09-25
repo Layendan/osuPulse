@@ -188,6 +188,7 @@ def cleanup_dirs():
 
 async def download_missing_beatmapsets(client: MilvusClient):
     index = 0
+    downloaded_pages = 0
     page = 0
     page_size = 50
     async with aiohttp.ClientSession() as session:
@@ -227,6 +228,11 @@ async def download_missing_beatmapsets(client: MilvusClient):
                 num_missing += 1
 
             if num_missing == 0:
+                downloaded_pages += 1
+            else:
+                downloaded_pages = 0
+
+            if downloaded_pages >= 5:
                 return index
 
             page += 1
