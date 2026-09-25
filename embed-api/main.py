@@ -72,6 +72,10 @@ ONLINE_CACHE_PATH = "online_cache.jsonl"
 
 COLLECTION_NAME = "osu_beatmap_collection"
 
+# Hinai endpoints
+HINAI_SEARCH_URL = "https://mirror.hinamizawa.ai/api/v1/hinai/search"
+HINAI_DOWNLOAD_URL = "https://mirror.hinamizawa.ai/api/v1/hinai/d"
+
 
 class BeatmapQuery(BaseModel):
     beatmap_id: int
@@ -136,10 +140,11 @@ async def background_beatmap_ingest(app):
     while True:
         client = app.state.milvus_client
         print("Processing new beatmaps")
+
         try:
             await process_new_ranked_maps(client)
         except Exception as e:
-            print(f"Error processing new beatmaps: {str(e)}")
+            print(f"Error processing new beatmaps: {e}")
         finally:
             await asyncio.sleep(1800)  # 30 minutes
 
@@ -147,28 +152,43 @@ async def background_beatmap_ingest(app):
 async def download_file(url: str, filepath: str):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
-            if "content-disposition" in response.headers:
-                header = response.headers["content-disposition"]
-                filename = unquote(header.split("filename=")[1].replace('"', ""))
+            response.raise_for_status()
+
+            content_disposition = response.headers.get("content-disposition")
+
+            if content_disposition and "filename=" in content_disposition:
+                filename = unquote(
+                    content_disposition.split("filename=", 1)[1]
+                    .replace('"', "")
+                    .strip()
+                )
             else:
-                filename = f"{url.split('/')[-1]}.osz"
+                filename = f"{url.rstrip('/').split('/')[-1]}.osz"
+
             path = os.path.join(filepath, filename)
+
             with open(path, "wb") as file:
                 while True:
-                    chunk = await response.content.read()
+                    chunk = await response.content.read(1024 * 1024)
                     if not chunk:
                         break
+
                     file.write(chunk)
-                print(f"Downloaded file {filename}")
+
+            print(f"Downloaded file {filename}")
 
 
-def beatmapset_exists_in_milvus(client: MilvusClient, beatmapsetid: int):
+def beatmapset_exists_in_milvus(
+    client: MilvusClient,
+    beatmapsetid: int,
+):
     results = client.query(
         collection_name=COLLECTION_NAME,
         filter=f"BeatmapSetId == {beatmapsetid}",
         output_fields=["BeatmapSetId"],
         limit=1,
     )
+
     return len(results) > 0
 
 
@@ -176,8 +196,10 @@ def cleanup_dirs():
     shutil.rmtree(ROOT_DIR, ignore_errors=True)
     shutil.rmtree(SKILLS_DIR, ignore_errors=True)
     shutil.rmtree(MAPPERATOR_DIR, ignore_errors=True)
+
     if os.path.exists(DIFFICULTY_FILE):
         os.remove(DIFFICULTY_FILE)
+
     if os.path.exists(ONLINE_CACHE_PATH):
         os.remove(ONLINE_CACHE_PATH)
 
@@ -186,53 +208,91 @@ def cleanup_dirs():
     os.makedirs(MAPPERATOR_DIR, exist_ok=True)
 
 
-async def download_missing_beatmapsets(client: MilvusClient):
+async def download_missing_beatmapsets(client: MilvusClient, status: str):
     index = 0
-    downloaded_pages = 0
+    downloaded_pages_without_results = 0
+
     page = 0
     page_size = 50
+
     async with aiohttp.ClientSession() as session:
         while True:
             print(f"Querying page {page}")
 
             params = {
-                "m": "osu",
-                "s": "ranked,loved",
-                "nsfw": "true",
+                "status": status,
+                "mode": "0",            # osu!standard
                 "sort": "ranked_desc",
-                "ps": page_size,
-                "p": page,
+                "amount": page_size,
+                "offset": page * page_size,
+                "explicit": "show",
             }
+
             async with session.get(
-                "https://api.nerinyan.moe/search", params=params
+                HINAI_SEARCH_URL,
+                params=params,
             ) as resp:
+                resp.raise_for_status()
                 beatmapsets = await resp.json()
 
-            # If no results on this page, stop early
+            # Hinai v1 returns a flat JSON array.
             if not beatmapsets:
                 print(f"No more results on page {page}")
                 return index
 
             num_missing = 0
+
             for beatmapset in beatmapsets:
-                if beatmapset["availability"]["download_disabled"]:
-                    print(f"Download disabled for beatmapset {beatmapset['id']}")
-                    continue
-                if beatmapset_exists_in_milvus(client, beatmapset["id"]):
-                    print(f"Beatmapset {beatmapset['id']} already exists in Milvus")
+                beatmapset_id = beatmapset["SetID"]
+
+                # Hinai’s CheeseGull-compatible response normally uses SetID.
+                # Keep this fallback if another compatible mirror is used later.
+                if "SetID" not in beatmapset:
+                    beatmapset_id = beatmapset.get("id")
+
+                if beatmapset_id is None:
+                    print(f"Skipping result without a beatmapset ID: {beatmapset}")
                     continue
 
-                url = f"https://api.nerinyan.moe/d/{beatmapset['id']}?noBg=true&NoHitsound=true&NoStoryboard=true&noVideo=true"
-                await download_file(url, ROOT_DIR)
+                # The v1 response may not include availability metadata.
+                # Since Hinai's download endpoint handles availability and
+                # fallback routing, download attempts are allowed to proceed.
+                if beatmapset_exists_in_milvus(client, int(beatmapset_id)):
+                    print(
+                        f"Beatmapset {beatmapset_id} already exists in Milvus"
+                    )
+                    continue
+
+                download_url = f"{HINAI_DOWNLOAD_URL}/{beatmapset_id}"
+
+                # Hinai supports no-video downloads through noVideo=1.
+                download_url += "?noVideo=1"
+
+                try:
+                    await download_file(download_url, ROOT_DIR)
+                except aiohttp.ClientResponseError as e:
+                    print(
+                        f"Failed to download beatmapset "
+                        f"{beatmapset_id}: HTTP {e.status}"
+                    )
+                    continue
+                except Exception as e:
+                    print(
+                        f"Failed to download beatmapset "
+                        f"{beatmapset_id}: {e}"
+                    )
+                    continue
+
                 index += 1
                 num_missing += 1
 
             if num_missing == 0:
-                downloaded_pages += 1
+                downloaded_pages_without_results += 1
             else:
-                downloaded_pages = 0
+                downloaded_pages_without_results = 0
 
-            if downloaded_pages >= 100:
+            # Stop after 100 consecutive pages contain no new maps.
+            if downloaded_pages_without_results >= 100:
                 return index
 
             page += 1
@@ -374,7 +434,8 @@ async def process_new_ranked_maps(client: MilvusClient):
     print("Downloading missing beatmapsets")
 
     # Download beatmaps
-    downloaded_len = await download_missing_beatmapsets(client)
+    downloaded_len = await download_missing_beatmapsets(client, "1")
+    downloaded_len += await download_missing_beatmapsets(client, "4")
 
     if downloaded_len == 0:
         print("No beatmaps to download")
