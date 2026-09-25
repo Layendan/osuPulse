@@ -192,6 +192,8 @@ async def download_missing_beatmapsets(client: MilvusClient):
     page_size = 50
     async with aiohttp.ClientSession() as session:
         while True:
+            print(f"Querying page {page}")
+
             params = {
                 "m": "osu",
                 "s": "ranked,loved",
@@ -207,13 +209,16 @@ async def download_missing_beatmapsets(client: MilvusClient):
 
             # If no results on this page, stop early
             if not beatmapsets:
+                print(f"No more results on page {page}")
                 return index
 
             num_missing = 0
             for beatmapset in beatmapsets:
                 if beatmapset["availability"]["download_disabled"]:
+                    print(f"Download disabled for beatmapset {beatmapset['id']}")
                     continue
                 if beatmapset_exists_in_milvus(client, beatmapset["id"]):
+                    print(f"Beatmapset {beatmapset['id']} already exists in Milvus")
                     continue
 
                 url = f"https://api.nerinyan.moe/d/{beatmapset['id']}?noBg=true&NoHitsound=true&NoStoryboard=true&noVideo=true"
