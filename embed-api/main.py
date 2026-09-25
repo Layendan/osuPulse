@@ -232,7 +232,7 @@ async def download_missing_beatmapsets(client: MilvusClient):
             else:
                 downloaded_pages = 0
 
-            if downloaded_pages >= 5:
+            if downloaded_pages >= 100:
                 return index
 
             page += 1
