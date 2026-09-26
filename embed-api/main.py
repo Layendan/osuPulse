@@ -433,7 +433,7 @@ async def process_new_ranked_maps(client: MilvusClient):
     print("Downloading missing beatmapsets")
 
     # Download beatmaps
-    downloaded_len = await download_missing_beatmapsets(client, "1", 100)
+    downloaded_len = await download_missing_beatmapsets(client, "1", 25)
     downloaded_len += await download_missing_beatmapsets(client, "4", 5)
 
     if downloaded_len == 0:
