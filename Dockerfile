@@ -1,8 +1,8 @@
 # Build
 FROM node:24.4.1-alpine3.21 AS build
 WORKDIR /app
-RUN corepack enable
-COPY package.json pnpm-lock.yaml ./
+RUN npm install -g pnpm@12.16.1
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm build
@@ -11,9 +11,9 @@ RUN pnpm build
 FROM node:24.4.1-alpine3.21 AS dependencies
 WORKDIR /app
 COPY ./package.json ./
-COPY ./pnpm-lock.yaml ./
-RUN corepack enable
-RUN pnpm i --production --frozen-lockfile
+COPY ./pnpm-lock.yaml ./pnpm-workspace.yaml ./
+RUN npm install -g pnpm@12.16.1
+RUN pnpm i --prod --frozen-lockfile
 
 # Runtime
 FROM node:24.4.1-alpine3.21 AS runtime
