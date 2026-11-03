@@ -27,6 +27,7 @@
 
 	let mods = $derived(data.mods);
 	let enumMods = $derived(getEnumMods(mods));
+	const canonical = $derived(`https://pulse.layendan.dev/b/${data.beatmap.id}`);
 	const url = $derived.by(() => {
 		const url = new URL(page.url);
 		url.searchParams.set('mods', mods.toString());
@@ -112,7 +113,8 @@
 		property="og:description"
 		content="Get detailed data for {data.beatmap.beatmapset
 			.title} with osu!Pulse. View key stats, difficulty levels, and performance insights while exploring personalized recommendations for similar maps to enhance your osu! gameplay experience." />
-	<meta property="og:url" content="https://pulse.layendan.dev" />
+	<link rel="canonical" href={canonical} />
+	<meta property="og:url" content={canonical} />
 	<meta property="og:site_name" content="osu!Pulse" />
 	<meta property="og:locale" content="en_US" />
 	<meta property="og:image" content={data.beatmap.beatmapset.covers['card@2x']} />

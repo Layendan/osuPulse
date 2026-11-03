@@ -977,6 +977,27 @@ async def get_difficulties(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/beatmap_ids/")
+async def get_beatmap_ids():
+    try:
+        client: MilvusClient = app.state.milvus_client
+        it = client.query_iterator(
+            collection_name=COLLECTION_NAME,
+            filter="Mods == 0",
+            output_fields=["BeatmapId"],
+            batch_size=10000,
+        )
+        ids = []
+        try:
+            while batch := it.next():
+                ids.extend(r["BeatmapId"] for r in batch)
+        finally:
+            it.close()
+        return sorted(set(ids))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/similar_beatmaps/")
 async def api_similar_beatmaps(
     beatmap_id: int,
